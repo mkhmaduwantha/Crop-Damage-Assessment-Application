@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "618314818440",
+    "project_id": "farm-buddy-app",
+    "storage_bucket": "farm-buddy-app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:618314818440:android:b29f8e3159de53a130903d",
+        "android_client_info": {
+          "package_name": "com.farmbuddy.crop_damage_assessment_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "618314818440-tjc5q311h8j98mihjkimdql4rdkprfkt.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAMGWD1-X7UfXmL_w0P12EE_hkH7AywbZg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "618314818440-tjc5q311h8j98mihjkimdql4rdkprfkt.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
