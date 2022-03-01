@@ -1,10 +1,15 @@
+import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:crop_damage_assessment_app/services/auth.dart';
 
-class Home extends StatelessWidget {
-  
-  Home({ Key? key }) : super(key: key);
+class SignIn extends StatefulWidget {
+  const SignIn({Key? key}) : super(key: key);
 
+  @override
+  _SignInState createState() => _SignInState();
+}
+
+class _SignInState extends State<SignIn> {
   final AuthService _auth = AuthService();
 
   @override
@@ -12,25 +17,22 @@ class Home extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.green[100],
       appBar: AppBar(
-        title: const Text('Farm Buddy - Home'),
+        title: const Text('Sign In to Farm Buddy'),
         backgroundColor: Colors.green[400],
         elevation: 0.0,
-        actions: <Widget>[
-          TextButton.icon(
-            icon: const Icon(Icons.person), 
-            label: const Text('logout'),
-            onPressed: () async{
-              await _auth.signout();
-            }
-
-          )
-        ],
       ),
       body: Container(
         padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 50.0),
         child: ElevatedButton(
-          child: const Text('Make Claim'),
+          child: const Text('Sign In Anon'),
           onPressed: () async {
+            dynamic result = await _auth.signAnonymously();
+            if (result == null) {
+              print('error signing in');
+            } else {
+              print('signed in');
+              print('Result ${result.uid}');
+            }
           },
         ),
       ),
