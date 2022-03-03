@@ -3,8 +3,8 @@ import 'package:crop_damage_assessment_app/services/auth.dart';
 import 'package:crop_damage_assessment_app/components/loading.dart';
 import 'package:crop_damage_assessment_app/components/decoration.dart';
 
-class SignIn extends StatefulWidget {
-  const SignIn({
+class Register extends StatefulWidget {
+  const Register({
     Key? key,
     required this.toggleView,
   }) : super(key: key);
@@ -12,14 +12,14 @@ class SignIn extends StatefulWidget {
   final Function toggleView;
 
   @override
-  _SignInState createState() => _SignInState();
+  _RegisterState createState() => _RegisterState();
 }
 
-class _SignInState extends State<SignIn> {
+class _RegisterState extends State<Register> {
   final AuthService _auth = AuthService();
   final _formKey = GlobalKey<FormState>();
-  bool loading = false;
   String error = '';
+  bool loading = false;
 
   // text field state
   String email = '';
@@ -28,15 +28,15 @@ class _SignInState extends State<SignIn> {
   @override
   Widget build(BuildContext context) {
     return loading ? const Loading() : Scaffold(
-      backgroundColor: Colors.brown[100],
+      backgroundColor: Colors.green[100],
       appBar: AppBar(
-        backgroundColor: Colors.brown[400],
+        title: const Text('Sign Up to Farm Buddy'),
+        backgroundColor: Colors.green[400],
         elevation: 0.0,
-        title: const Text('Sign In to Farm Buddy'),
         actions: <Widget>[
           TextButton.icon(
             icon: const Icon(Icons.person),
-            label: const Text('Sign In'),
+            label: const Text('Sign Up'),
             onPressed: () => widget.toggleView(),
           ),
         ],
@@ -59,15 +59,14 @@ class _SignInState extends State<SignIn> {
               TextFormField(
                 obscureText: true,
                 decoration: textInputDecoration.copyWith(hintText: 'Password'),
-                validator: (val) =>
-                    val!.length < 6 ? 'Enter a password 6+ chars long' : null,
+                validator: (val) => val!.length < 6 ? 'Enter a password 6+ chars long' : null,
                 onChanged: (val) {
                   setState(() => password = val);
                 },
               ),
               const SizedBox(height: 20.0),
               ElevatedButton(
-                  child: const Text('Sign In'),
+                  child: const Text('Sign Up'),
                   style: ElevatedButton.styleFrom(
                     primary: Colors.red, // background
                     onPrimary: Colors.white, // foreground
@@ -75,21 +74,20 @@ class _SignInState extends State<SignIn> {
                   onPressed: () async {
                     if (_formKey.currentState != null && _formKey.currentState!.validate()) {
                       setState(() { loading = true; });
-                      dynamic result = await _auth.signInWithEmailAndPassword(
-                          email, password);
-                      if (result == null) {
+                      dynamic result = await _auth.registerWithEmailAndPassword(email, password);
+                      if(result == null) {
                         setState(() {
-                          error = 'Could not sign in with those credentials';
+                          error = 'Please supply a valid email';
                           loading = false;
-                        });
+                          });
                       }
                     }
                   }),
-              const SizedBox(height: 12.0),
-              Text(
-                error,
-                style: const TextStyle(color: Colors.red, fontSize: 14.0),
-              )
+                  const SizedBox(height: 12.0),
+                  Text(
+                    error,
+                    style: const TextStyle(color: Colors.red, fontSize: 14.0),
+                  )
             ],
           ),
         ),

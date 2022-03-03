@@ -1,6 +1,6 @@
 import 'package:crop_damage_assessment_app/models/farmer.dart';
 
-import 'home/home.dart';
+import 'farmer/home/home.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'authenticate/authenticate.dart';
