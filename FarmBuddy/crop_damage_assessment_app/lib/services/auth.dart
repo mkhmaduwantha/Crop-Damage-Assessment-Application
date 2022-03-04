@@ -19,18 +19,6 @@ class AuthService {
     return _auth.authStateChanges().map(_userFromFirebaseUser);
   }
 
-  //sign in anon
-  Future signAnonymously() async {
-    try {
-      UserCredential result = await _auth.signInAnonymously();
-      User? user = result.user;
-      return _userFromFirebaseUser(user);
-    } catch (e) {
-      print(e.toString());
-      return null;
-    }
-  }
-
   //sign in with email & password
   Future signInWithEmailAndPassword(String email, String password) async {
     try {
@@ -53,6 +41,19 @@ class AuthService {
       print(error.toString());
       return null;
     } 
+  }
+
+  //verifyOTP
+  Future verifyOTP(verificationID, optCode) async {
+    try {
+      PhoneAuthCredential credential = PhoneAuthProvider.credential(verificationId: verificationID, smsCode: optCode);
+      UserCredential result = await _auth.signInWithCredential(credential);
+      User? user = result.user;
+      return _userFromFirebaseUser(user);
+    } catch (e) {
+      print(e.toString());
+      return null;
+    }
   }
 
   //sign out

@@ -37,7 +37,7 @@ class _SignInState extends State<SignIn> {
           TextButton.icon(
             icon: const Icon(Icons.person),
             label: const Text('Sign In'),
-            onPressed: () => widget.toggleView(),
+            onPressed: () => widget.toggleView(3),
           ),
         ],
       ),
@@ -75,8 +75,7 @@ class _SignInState extends State<SignIn> {
                   onPressed: () async {
                     if (_formKey.currentState != null && _formKey.currentState!.validate()) {
                       setState(() { loading = true; });
-                      dynamic result = await _auth.signInWithEmailAndPassword(
-                          email, password);
+                      dynamic result = await _auth.signInWithEmailAndPassword(email, password);
                       if (result == null) {
                         setState(() {
                           error = 'Could not sign in with those credentials';
