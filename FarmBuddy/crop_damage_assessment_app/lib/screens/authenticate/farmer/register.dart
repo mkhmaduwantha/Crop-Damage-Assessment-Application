@@ -36,10 +36,10 @@ class _RegisterState extends State<Register> {
     return loading
         ? const Loading()
         : Scaffold(
-            backgroundColor: Colors.green[100],
+            backgroundColor: const Color.fromARGB(255, 242, 255, 243),
             appBar: AppBar(
               title: const Text('Sign Up to Farm Buddy'),
-              backgroundColor: Colors.green[400],
+              backgroundColor: const Color.fromARGB(255, 71, 143, 75),
               elevation: 0.0,
               actions: <Widget>[
                 TextButton.icon(
@@ -60,10 +60,8 @@ class _RegisterState extends State<Register> {
                           const SizedBox(height: 20.0),
                           TextFormField(
                             keyboardType: TextInputType.phone,
-                            decoration: textInputDecoration.copyWith(
-                                hintText: 'Phone Number'),
-                            validator: (val) =>
-                                val!.isEmpty ? 'Enter a Phone Number' : null,
+                            decoration: textInputDecoration.copyWith( hintText: 'Phone Number'),
+                            validator: (val) => val!.isEmpty ? 'Enter a Phone Number' : null,
                             onChanged: (val) {
                               setState(() => phone_no = val);
                               setState(() => error = "");
@@ -74,7 +72,7 @@ class _RegisterState extends State<Register> {
                           ElevatedButton(
                               child: const Text('Sign Up'),
                               style: ElevatedButton.styleFrom(
-                                primary: Colors.red, // background
+                                primary: const Color.fromARGB(255, 71, 143, 75), // background
                                 onPrimary: Colors.white, // foreground
                               ),
                               onPressed: () async {
