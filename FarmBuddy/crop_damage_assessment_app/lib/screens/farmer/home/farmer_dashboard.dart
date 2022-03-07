@@ -18,6 +18,9 @@ class FarmerDashboard extends StatelessWidget {
           TextButton.icon(
               icon: const Icon(Icons.person),
               label: const Text('logout'),
+              style: TextButton.styleFrom(
+                primary: Colors.white, // foreground
+              ),
               onPressed: () async {
                 await _auth.signout();
               })
