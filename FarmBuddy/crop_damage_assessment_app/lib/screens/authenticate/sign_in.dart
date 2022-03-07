@@ -45,7 +45,10 @@ class _SignInState extends State<SignIn> {
                 TextButton.icon(
                   icon: const Icon(Icons.person),
                   label: const Text('Sign In'),
-                  onPressed: () => widget.toggleView(3),
+                  style: TextButton.styleFrom(
+                    primary: Colors.white, // foreground
+                  ),
+                  onPressed: () => widget.toggleView(2),
                 ),
               ],
             ),
@@ -132,8 +135,7 @@ class _SignInState extends State<SignIn> {
                                   setState(() {
                                     loading = true;
                                   });
-                                  dynamic result = await _auth.verifyOTP(
-                                      verificationID, opt_code);
+                                  dynamic result = await _auth.verifyOTP(verificationID, opt_code);
                                   print(result);
                                   if (result == null && mounted) {
                                     setState(() {

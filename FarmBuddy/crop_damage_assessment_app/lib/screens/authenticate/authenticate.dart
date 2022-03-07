@@ -1,6 +1,6 @@
-import 'package:crop_damage_assessment_app/screens/authenticate/farmer/register.dart';
-import 'package:crop_damage_assessment_app/screens/authenticate/sign_in.dart';
 import 'package:flutter/material.dart';
+import 'package:crop_damage_assessment_app/screens/authenticate/sign_in.dart';
+import 'package:crop_damage_assessment_app/screens/authenticate/farmer/sign_up.dart';
 
 class Authenticate extends StatefulWidget {
   const Authenticate({ Key? key }) : super(key: key);
@@ -11,19 +11,34 @@ class Authenticate extends StatefulWidget {
 
 class _AuthenticateState extends State<Authenticate> {
 
-  bool showSignIn = true;
+  int showSignIn = 1;
 
   void toggleView(step){
-    // print(step);
-    setState(() => showSignIn = !showSignIn);
+    setState(() => showSignIn = step);
   }
 
   @override
   Widget build(BuildContext context) {
-    if (showSignIn) {
+    if (showSignIn == 1) {
       return SignIn(toggleView:  toggleView);
-    } else {
-      return Register(toggleView:  toggleView);
+    } else if(showSignIn == 2) {
+      return SignUp(toggleView:  toggleView);
+    } else{
+      return SignIn(toggleView:  toggleView);
     }
+
+    // switch (showSignIn) {
+    //   case 1:
+    //     return SignIn(toggleView:  toggleView);
+    //   case 2:
+    //     return SignUp(toggleView:  toggleView);
+    //   case 3:
+    //     return AddData(toggleView:  toggleView);
+    //   default:
+    //     return SignIn(toggleView:  toggleView);
+    // }
+
   }
 }
+
+// 1 - sign in || 2 - sign up  || 3 - add data

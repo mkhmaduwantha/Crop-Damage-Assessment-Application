@@ -4,8 +4,8 @@ import 'package:crop_damage_assessment_app/services/auth.dart';
 import 'package:crop_damage_assessment_app/components/loading.dart';
 import 'package:crop_damage_assessment_app/components/decoration.dart';
 
-class Register extends StatefulWidget {
-  const Register({
+class SignUp extends StatefulWidget {
+  const SignUp({
     Key? key,
     required this.toggleView,
   }) : super(key: key);
@@ -13,10 +13,10 @@ class Register extends StatefulWidget {
   final Function toggleView;
 
   @override
-  _RegisterState createState() => _RegisterState();
+  _SignUpState createState() => _SignUpState();
 }
 
-class _RegisterState extends State<Register> {
+class _SignUpState extends State<SignUp> {
   final AuthService _auth = AuthService();
   final FirebaseAuth auth_in = FirebaseAuth.instance;
 
@@ -45,39 +45,45 @@ class _RegisterState extends State<Register> {
                 TextButton.icon(
                   icon: const Icon(Icons.person),
                   label: const Text('Sign Up'),
+                  style: TextButton.styleFrom(
+                    primary: Colors.white, // foreground
+                  ),
                   onPressed: () => widget.toggleView(1),
                 ),
               ],
             ),
             body: Container(
-              padding:
-                  const EdgeInsets.symmetric(vertical: 20.0, horizontal: 50.0),
-              child: !otpVisibility
-                  ? Form(
+              padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 50.0),
+              child: !otpVisibility ? Form(
                       key: _formKey_1,
                       child: Column(
                         children: <Widget>[
                           const SizedBox(height: 20.0),
                           TextFormField(
                             keyboardType: TextInputType.phone,
-                            decoration: textInputDecoration.copyWith( hintText: 'Phone Number'),
-                            validator: (val) => val!.isEmpty ? 'Enter a Phone Number' : null,
+                            decoration: textInputDecoration.copyWith(
+                                hintText: 'Phone Number'),
+                            validator: (val) =>
+                                val!.isEmpty ? 'Enter a Phone Number' : null,
                             onChanged: (val) {
                               setState(() => phone_no = val);
                               setState(() => error = "");
                             },
                           ),
-
                           const SizedBox(height: 20.0),
                           ElevatedButton(
                               child: const Text('Sign Up'),
                               style: ElevatedButton.styleFrom(
-                                primary: const Color.fromARGB(255, 71, 143, 75), // background
+                                primary: const Color.fromARGB(
+                                    255, 71, 143, 75), // background
                                 onPrimary: Colors.white, // foreground
                               ),
                               onPressed: () async {
-                                if (_formKey_1.currentState != null && _formKey_1.currentState!.validate()) {
-                                  setState(() { loading = true; });
+                                if (_formKey_1.currentState != null &&
+                                    _formKey_1.currentState!.validate()) {
+                                  setState(() {
+                                    loading = true;
+                                  });
                                   loginWithPhone();
                                 }
                               }),
@@ -107,18 +113,18 @@ class _RegisterState extends State<Register> {
                               setState(() => error = "");
                             },
                           ),
-
                           TextButton(
                             style: TextButton.styleFrom(
                               textStyle: const TextStyle(fontSize: 16),
                             ),
                             onPressed: () async {
-                              setState(() { loading = true; });
+                              setState(() {
+                                loading = true;
+                              });
                               loginWithPhone();
                             },
                             child: const Text('Resend OPT code'),
                           ),
-
                           const SizedBox(height: 20.0),
                           ElevatedButton(
                               child: const Text('Verify'),
@@ -132,15 +138,20 @@ class _RegisterState extends State<Register> {
                                   setState(() {
                                     loading = true;
                                   });
-                                  dynamic result = await _auth.verifyOTP(
-                                      verificationID, opt_code);
+                                  dynamic result = await _auth.verifyOTP(verificationID, opt_code);
                                   print(result);
                                   if (result == null && mounted) {
                                     setState(() {
                                       error = "Invalid OPT code";
                                       loading = false;
                                     });
-                                  }
+                                  } 
+                                  // else {
+                                  //   Navigator.push(
+                                  //     context,
+                                  //     MaterialPageRoute(builder: (context) => const AddData()),
+                                  //   );
+                                  // }
                                 }
                               }),
                           const SizedBox(height: 12.0),
