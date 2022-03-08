@@ -26,9 +26,8 @@ class DatabaseService {
     return user_collection.doc(uid).snapshots().map(_userDataFromSnapshot);
   }
 
-  Future updateUserData(String uid, String name, String email, String type) async {
-    return await user_collection.doc(uid).set(
-        {'uid': uid, 'name': name, 'email': email, 'type': type}, SetOptions(merge: true));
+  Future updateUserData(var user_data) async {
+    return await user_collection.doc(uid).set(user_data, SetOptions(merge: true));
   }
 
   Future getUserData() async {

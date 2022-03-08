@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:crop_damage_assessment_app/models/user.dart';
-import 'package:crop_damage_assessment_app/models/farmer.dart';
+import 'package:crop_damage_assessment_app/models/user_auth.dart';
 import 'package:crop_damage_assessment_app/services/database.dart';
 // import 'package:crop_damage_assessment_app/components/loading.dart';
 import 'package:crop_damage_assessment_app/screens/farmer/add_data.dart';
@@ -14,31 +14,29 @@ class Home extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final user = Provider.of<Farmer?>(context);
+    final user = Provider.of<UserAuth?>(context);
     print('user ${user?.uid}');
 
     return StreamBuilder<UserData>(
-      stream: DatabaseService(uid: user?.uid).userData,
-      builder: (context, snapshot) {
-        if(snapshot.hasData){
-          UserData? userData = snapshot.data;
-          print('userData stream ${userData?.type}');
+        stream: DatabaseService(uid: user?.uid).userData,
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            UserData? user = snapshot.data;
+            print('userData stream ${user?.type}');
 
-          switch (userData?.type) {
-            case 'farmer':
-              return FarmerDashboard(key: key);
-            case 'officer':
-              return OfficerDashboard(key: key);
-            case 'admin':
-              return AdminDashboard(key: key);
-            default:
-              return FarmerAddData(key: key);
+            switch (user?.type) {
+              case 'farmer':
+                return FarmerDashboard(key: key);
+              case 'officer':
+                return OfficerDashboard(key: key);
+              case 'admin':
+                return AdminDashboard(key: key);
+              default:
+                return FarmerAddData(uid: user?.uid);
+            }
+          } else {
+            return FarmerAddData(uid: user?.uid);
           }
-          
-        } else {
-          return FarmerAddData(key: key);
-        }
-      }
-    );
+        });
   }
 }

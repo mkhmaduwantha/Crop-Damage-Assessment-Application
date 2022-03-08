@@ -133,11 +133,8 @@ class _SignUpState extends State<SignUp> {
                                 onPrimary: Colors.white, // foreground
                               ),
                               onPressed: () async {
-                                if (_formKey_2.currentState != null &&
-                                    _formKey_2.currentState!.validate()) {
-                                  setState(() {
-                                    loading = true;
-                                  });
+                                if (_formKey_2.currentState != null && _formKey_2.currentState!.validate()) {
+                                  setState(() { loading = true;});
                                   dynamic result = await _auth.verifyOTP(verificationID, opt_code);
                                   print(result);
                                   if (result == null && mounted) {

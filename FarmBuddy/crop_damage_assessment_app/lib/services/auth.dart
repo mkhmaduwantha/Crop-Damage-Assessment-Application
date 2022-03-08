@@ -1,21 +1,21 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:crop_damage_assessment_app/models/farmer.dart';
+import 'package:crop_damage_assessment_app/models/user_auth.dart';
 import 'package:crop_damage_assessment_app/services/database.dart';
 
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   //create user object based on firebase user
-  Farmer? _userFromFirebaseUser(User? user) {
+  UserAuth? _userFromFirebaseUser(User? user) {
     if (user != null) {
-      return Farmer(uid: user.uid);
+      return UserAuth(uid: user.uid);
     } else {
       return null;
     }
   }
 
   //auth change user stream
-  Stream<Farmer?> get user {
+  Stream<UserAuth?> get user {
     final user = _auth.authStateChanges().map(_userFromFirebaseUser);
     return user;
   }

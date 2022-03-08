@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:crop_damage_assessment_app/services/auth.dart';
+import 'package:crop_damage_assessment_app/services/database.dart';
 import 'package:crop_damage_assessment_app/components/loading.dart';
 import 'package:crop_damage_assessment_app/components/decoration.dart';
 
 class FarmerAddData extends StatefulWidget {
-  const FarmerAddData({Key? key}) : super(key: key);
+  const FarmerAddData({Key? key, required this.uid}) : super(key: key);
+
+  final String? uid;
 
   @override
   _FarmerAddDataState createState() => _FarmerAddDataState();
@@ -19,6 +22,7 @@ class _FarmerAddDataState extends State<FarmerAddData> {
 
   // text field state
   String name = "";
+  String type = "farmer";
   String email = "";
   String phone_no = "";
 
@@ -33,6 +37,7 @@ class _FarmerAddDataState extends State<FarmerAddData> {
   String branch = "";
 
   String profile_image = "";
+
   static const List<String> _agrarianDivisionOptions = <String>[
     'galle',
     'matara',
@@ -45,6 +50,7 @@ class _FarmerAddDataState extends State<FarmerAddData> {
     'east',
     'north'
   ];
+
   @override
   Widget build(BuildContext context) {
     return loading
@@ -122,7 +128,6 @@ class _FarmerAddDataState extends State<FarmerAddData> {
                           setState(() => error = "");
                         },
                       ),
-
                       const SizedBox(height: 20.0),
                       Autocomplete<String>(
                           optionsBuilder: (TextEditingValue textEditingValue) {
@@ -147,8 +152,11 @@ class _FarmerAddDataState extends State<FarmerAddData> {
                           controller: fieldTextEditingController,
                           focusNode: fieldFocusNode,
                           keyboardType: TextInputType.text,
-                          decoration: textInputDecoration.copyWith( hintText: 'Agrarian Division'),
-                          validator: (val) => agrarian_division.isEmpty ? 'Select your agrarian division' : null,
+                          decoration: textInputDecoration.copyWith(
+                              hintText: 'Agrarian Division'),
+                          validator: (val) => agrarian_division.isEmpty
+                              ? 'Select your agrarian division'
+                              : null,
                           onChanged: (val) {
                             setState(() => agrarian_division = "");
                             setState(() => error = "");
@@ -159,7 +167,6 @@ class _FarmerAddDataState extends State<FarmerAddData> {
                         setState(() => error = "");
                         // debugPrint('You just selected $selection');
                       }),
-
                       const SizedBox(height: 20.0),
                       TextFormField(
                         keyboardType: TextInputType.text,
@@ -172,7 +179,6 @@ class _FarmerAddDataState extends State<FarmerAddData> {
                           setState(() => error = "");
                         },
                       ),
-
                       const SizedBox(height: 20.0),
                       TextFormField(
                         keyboardType: TextInputType.streetAddress,
@@ -185,7 +191,6 @@ class _FarmerAddDataState extends State<FarmerAddData> {
                           setState(() => error = "");
                         },
                       ),
-
                       const SizedBox(height: 20.0),
                       Autocomplete<String>(
                           optionsBuilder: (TextEditingValue textEditingValue) {
@@ -210,8 +215,10 @@ class _FarmerAddDataState extends State<FarmerAddData> {
                           controller: fieldTextEditingController,
                           focusNode: fieldFocusNode,
                           keyboardType: TextInputType.text,
-                          decoration: textInputDecoration.copyWith( hintText: 'Province'),
-                          validator: (val) => province.isEmpty ? 'Select your province' : null,
+                          decoration: textInputDecoration.copyWith(
+                              hintText: 'Province'),
+                          validator: (val) =>
+                              province.isEmpty ? 'Select your province' : null,
                           onChanged: (val) {
                             setState(() => province = "");
                             setState(() => error = "");
@@ -222,8 +229,7 @@ class _FarmerAddDataState extends State<FarmerAddData> {
                         setState(() => error = "");
                         // debugPrint('You just selected $selection');
                       }),
-
-                      const SizedBox(height: 40.0), 
+                      const SizedBox(height: 40.0),
                       const Align(
                         alignment: Alignment.centerLeft,
                         child: Text(
@@ -235,68 +241,85 @@ class _FarmerAddDataState extends State<FarmerAddData> {
                               color: Color.fromARGB(255, 32, 196, 100)),
                         ),
                       ),
-
                       const SizedBox(height: 20.0),
                       TextFormField(
                         keyboardType: TextInputType.name,
-                        decoration: textInputDecoration.copyWith(hintText: 'Bank Name'),
-                        validator: (val) => val!.isEmpty ? 'Enter your bank name' : null,
+                        decoration:
+                            textInputDecoration.copyWith(hintText: 'Bank Name'),
+                        validator: (val) =>
+                            val!.isEmpty ? 'Enter your bank name' : null,
                         onChanged: (val) {
                           setState(() => account_name = val);
                           setState(() => error = "");
                         },
                       ),
-
                       const SizedBox(height: 20.0),
                       TextFormField(
                         keyboardType: TextInputType.name,
-                        decoration: textInputDecoration.copyWith(hintText: 'Name in Bank Account'),
-                        validator: (val) => val!.isEmpty ? 'Enter your name in bank account' : null,
+                        decoration: textInputDecoration.copyWith(
+                            hintText: 'Name in Bank Account'),
+                        validator: (val) => val!.isEmpty
+                            ? 'Enter your name in bank account'
+                            : null,
                         onChanged: (val) {
                           setState(() => bank = val);
                           setState(() => error = "");
                         },
                       ),
-
                       const SizedBox(height: 20.0),
                       TextFormField(
                         keyboardType: TextInputType.name,
-                        decoration: textInputDecoration.copyWith(hintText: 'Account No'),
-                        validator: (val) => val!.isEmpty ? 'Enter your account no' : null,
+                        decoration: textInputDecoration.copyWith(
+                            hintText: 'Account No'),
+                        validator: (val) =>
+                            val!.isEmpty ? 'Enter your account no' : null,
                         onChanged: (val) {
                           setState(() => account_no = val);
                           setState(() => error = "");
                         },
                       ),
-
                       const SizedBox(height: 20.0),
                       TextFormField(
                         keyboardType: TextInputType.name,
-                        decoration: textInputDecoration.copyWith(hintText: 'Branch Name'),
-                        validator: (val) => val!.isEmpty ? 'Enter your branch name' : null,
+                        decoration: textInputDecoration.copyWith(
+                            hintText: 'Branch Name'),
+                        validator: (val) =>
+                            val!.isEmpty ? 'Enter your branch name' : null,
                         onChanged: (val) {
                           setState(() => branch = val);
                           setState(() => error = "");
                         },
                       ),
-
                       const SizedBox(height: 20.0),
                       ElevatedButton(
                           child: const Text('Submit'),
                           style: ElevatedButton.styleFrom(
-                            primary: const Color.fromARGB(
-                                255, 71, 143, 75), // background
+                            primary: const Color.fromARGB(255, 71, 143, 75), // background
                             onPrimary: Colors.white, // foreground
                           ),
                           onPressed: () async {
-                            print("agrarian_division {$agrarian_division}");
-                            print(agrarian_division.isEmpty);
-                            if (_formKey.currentState != null &&
-                                _formKey.currentState!.validate()) {
-                              setState(() {
-                                loading = true;
-                              });
+                            // print("agrarian_division {$agrarian_division}");
+                            // print(agrarian_division.isEmpty);
+                            if (_formKey.currentState != null && _formKey.currentState!.validate()) {
+                              setState(() { loading = true; });
+                              var user_data = {
+                                "uid": widget.uid,
+                                "name": name,
+                                "email": email,
+                                "type": type,
+                                "phone_no": phone_no,
+                                "agrarian_division": agrarian_division,
+                                "nic": nic,
+                                "address": address,
+                                "province": province,
+                                "bank": bank,
+                                "account_name": account_name,
+                                "account_no": account_no,
+                                "branch": branch
+                              };
+                              await DatabaseService(uid: widget.uid).updateUserData(user_data);
                             }
+                            
                           }),
                       const SizedBox(height: 12.0),
                       Text(
