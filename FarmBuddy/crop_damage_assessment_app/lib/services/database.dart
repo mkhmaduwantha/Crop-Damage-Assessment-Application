@@ -1,4 +1,7 @@
+import 'dart:io';
+import 'package:path/path.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:crop_damage_assessment_app/models/user.dart';
 
 class DatabaseService {
@@ -7,7 +10,8 @@ class DatabaseService {
   DatabaseService({required this.uid});
 
   // collection reference
-  final CollectionReference user_collection = FirebaseFirestore.instance.collection('user');
+  final CollectionReference user_collection =
+      FirebaseFirestore.instance.collection('user');
 
   // user data from snapshots
   UserData _userDataFromSnapshot(DocumentSnapshot snapshot) {
@@ -27,7 +31,9 @@ class DatabaseService {
   }
 
   Future updateUserData(var user_data) async {
-    return await user_collection.doc(uid).set(user_data, SetOptions(merge: true));
+    return await user_collection
+        .doc(uid)
+        .set(user_data, SetOptions(merge: true));
   }
 
   Future getUserData() async {
@@ -41,5 +47,23 @@ class DatabaseService {
         print('Document does not exist on the database');
       }
     });
+  }
+
+  Future uploadImageToFirebase(String root, File? imageFile) async {
+    String downloadURL = "";
+    String fileName = uid! + extension(imageFile!.path);
+    try {
+
+      await firebase_storage.FirebaseStorage.instance
+          .ref('$root/$fileName')
+          .putFile(imageFile);
+      downloadURL = await firebase_storage.FirebaseStorage.instance
+          .ref('$root/$fileName')
+          .getDownloadURL();
+      return downloadURL;
+    } catch (error) {
+      print(error.toString());
+      return downloadURL;
+    }
   }
 }

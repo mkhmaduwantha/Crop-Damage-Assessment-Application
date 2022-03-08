@@ -1,6 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:crop_damage_assessment_app/models/user_auth.dart';
-import 'package:crop_damage_assessment_app/services/database.dart';
 
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -8,7 +7,7 @@ class AuthService {
   //create user object based on firebase user
   UserAuth? _userFromFirebaseUser(User? user) {
     if (user != null) {
-      return UserAuth(uid: user.uid);
+      return UserAuth(uid: user.uid, phone_no: user.phoneNumber);
     } else {
       return null;
     }

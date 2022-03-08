@@ -1,4 +1,8 @@
 class UserAuth {
   final String? uid;
-  UserAuth({this.uid});
+  final String? phone_no;
+  UserAuth({
+    this.uid,
+    this.phone_no
+  });
 }

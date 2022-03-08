@@ -1,13 +1,16 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:crop_damage_assessment_app/services/auth.dart';
 import 'package:crop_damage_assessment_app/services/database.dart';
 import 'package:crop_damage_assessment_app/components/loading.dart';
 import 'package:crop_damage_assessment_app/components/decoration.dart';
 
 class FarmerAddData extends StatefulWidget {
-  const FarmerAddData({Key? key, required this.uid}) : super(key: key);
+  const FarmerAddData({Key? key, required this.uid, required this.phone_no}) : super(key: key);
 
   final String? uid;
+  final String? phone_no;
 
   @override
   _FarmerAddDataState createState() => _FarmerAddDataState();
@@ -24,7 +27,6 @@ class _FarmerAddDataState extends State<FarmerAddData> {
   String name = "";
   String type = "farmer";
   String email = "";
-  String phone_no = "";
 
   String agrarian_division = "";
   String nic = "";
@@ -36,7 +38,7 @@ class _FarmerAddDataState extends State<FarmerAddData> {
   String account_no = "";
   String branch = "";
 
-  String profile_image = "";
+  File? profile_image;
 
   static const List<String> _agrarianDivisionOptions = <String>[
     'galle',
@@ -50,6 +52,15 @@ class _FarmerAddDataState extends State<FarmerAddData> {
     'east',
     'north'
   ];
+
+  final picker = ImagePicker();
+  Future pickImage() async {
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+
+    setState(() {
+      profile_image = File(pickedFile!.path);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -116,18 +127,7 @@ class _FarmerAddDataState extends State<FarmerAddData> {
                           setState(() => error = "");
                         },
                       ),
-                      const SizedBox(height: 20.0),
-                      TextFormField(
-                        keyboardType: TextInputType.phone,
-                        decoration: textInputDecoration.copyWith(
-                            hintText: 'Phone Number'),
-                        validator: (val) =>
-                            val!.isEmpty ? 'Enter a Phone Number' : null,
-                        onChanged: (val) {
-                          setState(() => phone_no = val);
-                          setState(() => error = "");
-                        },
-                      ),
+
                       const SizedBox(height: 20.0),
                       Autocomplete<String>(
                           optionsBuilder: (TextEditingValue textEditingValue) {
@@ -290,24 +290,56 @@ class _FarmerAddDataState extends State<FarmerAddData> {
                           setState(() => error = "");
                         },
                       ),
+                      const SizedBox(height: 40.0),
+                      const Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          'Profile Image',
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20.0,
+                              color: Color.fromARGB(255, 32, 196, 100)),
+                        ),
+                      ),
+                      const SizedBox(height: 20.0),
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(30.0),
+                        // ignore: unnecessary_null_comparison
+                        child: profile_image != null
+                            ? Image.file(profile_image!)
+                            : TextButton(
+                                child: const Icon(
+                                  Icons.add_a_photo,
+                                  size: 50,
+                                ),
+                                onPressed: pickImage,
+                              ),
+                      ),
                       const SizedBox(height: 20.0),
                       ElevatedButton(
                           child: const Text('Submit'),
                           style: ElevatedButton.styleFrom(
-                            primary: const Color.fromARGB(255, 71, 143, 75), // background
+                            primary: const Color.fromARGB(
+                                255, 71, 143, 75), // background
                             onPrimary: Colors.white, // foreground
                           ),
                           onPressed: () async {
                             // print("agrarian_division {$agrarian_division}");
                             // print(agrarian_division.isEmpty);
+
                             if (_formKey.currentState != null && _formKey.currentState!.validate()) {
+
                               setState(() { loading = true; });
+                              DatabaseService db = DatabaseService(uid: widget.uid);
+                              String profile_url = await db.uploadImageToFirebase("profile", profile_image);
+                              
                               var user_data = {
                                 "uid": widget.uid,
                                 "name": name,
                                 "email": email,
                                 "type": type,
-                                "phone_no": phone_no,
+                                "phone_no": widget.phone_no,
                                 "agrarian_division": agrarian_division,
                                 "nic": nic,
                                 "address": address,
@@ -315,11 +347,12 @@ class _FarmerAddDataState extends State<FarmerAddData> {
                                 "bank": bank,
                                 "account_name": account_name,
                                 "account_no": account_no,
-                                "branch": branch
+                                "branch": branch,
+                                "profile_url": profile_url
                               };
-                              await DatabaseService(uid: widget.uid).updateUserData(user_data);
+
+                              await db.updateUserData(user_data);
                             }
-                            
                           }),
                       const SizedBox(height: 12.0),
                       Text(

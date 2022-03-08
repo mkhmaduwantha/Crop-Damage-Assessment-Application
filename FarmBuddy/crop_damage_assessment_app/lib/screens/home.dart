@@ -14,11 +14,11 @@ class Home extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final user = Provider.of<UserAuth?>(context);
-    print('user ${user?.uid}');
+    final user_auth = Provider.of<UserAuth?>(context);
+    print('user ${user_auth?.uid}');
 
     return StreamBuilder<UserData>(
-        stream: DatabaseService(uid: user?.uid).userData,
+        stream: DatabaseService(uid: user_auth?.uid).userData,
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             UserData? user = snapshot.data;
@@ -32,10 +32,10 @@ class Home extends StatelessWidget {
               case 'admin':
                 return AdminDashboard(key: key);
               default:
-                return FarmerAddData(uid: user?.uid);
+                return FarmerAddData(uid: user_auth?.uid, phone_no: user_auth?.phone_no);
             }
           } else {
-            return FarmerAddData(uid: user?.uid);
+            return FarmerAddData(uid: user_auth?.uid, phone_no: user_auth?.phone_no);
           }
         });
   }
