@@ -53,8 +53,7 @@ class _SignInState extends State<SignIn> {
               ],
             ),
             body: Container(
-              padding:
-                  const EdgeInsets.symmetric(vertical: 20.0, horizontal: 50.0),
+              padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 50.0),
               child: !otpVisibility
                   ? Form(
                       key: _formKey_1,

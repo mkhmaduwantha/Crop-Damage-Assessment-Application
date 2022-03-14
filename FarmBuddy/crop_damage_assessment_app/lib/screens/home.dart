@@ -26,7 +26,8 @@ class Home extends StatelessWidget {
 
             switch (user?.type) {
               case 'farmer':
-                return FarmerDashboard(key: key);
+                // return FarmerDashboard(key: key);
+                return FarmerDashboard(uid: user_auth?.uid);
               case 'officer':
                 return OfficerDashboard(key: key);
               case 'admin':

@@ -6,17 +6,16 @@ import 'package:crop_damage_assessment_app/services/database.dart';
 import 'package:crop_damage_assessment_app/components/loading.dart';
 import 'package:crop_damage_assessment_app/components/decoration.dart';
 
-class FarmerAddData extends StatefulWidget {
-  const FarmerAddData({Key? key, required this.uid, required this.phone_no}) : super(key: key);
+class AddClaim extends StatefulWidget {
+  const AddClaim({Key? key, required this.uid}) : super(key: key);
 
   final String? uid;
-  final String? phone_no;
 
   @override
-  _FarmerAddDataState createState() => _FarmerAddDataState();
+  _AddClaimState createState() => _AddClaimState();
 }
 
-class _FarmerAddDataState extends State<FarmerAddData> {
+class _AddClaimState extends State<AddClaim> {
   final AuthService _auth = AuthService();
 
   final _formKey = GlobalKey<FormState>();
@@ -66,27 +65,8 @@ class _FarmerAddDataState extends State<FarmerAddData> {
   Widget build(BuildContext context) {
     return loading
         ? const Loading()
-        : Scaffold(
-            backgroundColor: const Color.fromARGB(255, 242, 255, 243),
-            resizeToAvoidBottomInset: false,
-            appBar: AppBar(
-              title: const Text('Add Data'),
-              backgroundColor: const Color.fromARGB(255, 105, 184, 109),
-              elevation: 0.0,
-              actions: <Widget>[
-                TextButton.icon(
-                    icon: const Icon(Icons.person),
-                    label: const Text('logout'),
-                    style: TextButton.styleFrom(
-                      primary: Colors.white, // foreground
-                    ),
-                    onPressed: () async {
-                      await _auth.signout();
-                    })
-              ],
-            ),
-            body: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric( vertical: 20.0, horizontal: 50.0),
+        : SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 50.0),
                 child: Form(
                   key: _formKey,
                   child: Column(
@@ -333,24 +313,24 @@ class _FarmerAddDataState extends State<FarmerAddData> {
                               DatabaseService db = DatabaseService(uid: widget.uid);
                               String profile_url = await db.uploadImageToFirebase("profile", profile_image);
                               
-                              var user_data = {
-                                "uid": widget.uid,
-                                "name": name,
-                                "email": email,
-                                "type": type,
-                                "phone_no": widget.phone_no,
-                                "agrarian_division": agrarian_division,
-                                "nic": nic,
-                                "address": address,
-                                "province": province,
-                                "bank": bank,
-                                "account_name": account_name,
-                                "account_no": account_no,
-                                "branch": branch,
-                                "profile_url": profile_url
-                              };
+                              // var user_data = {
+                              //   "uid": widget.uid,
+                              //   "name": name,
+                              //   "email": email,
+                              //   "type": type,
+                              //   "phone_no": widget.phone_no,
+                              //   "agrarian_division": agrarian_division,
+                              //   "nic": nic,
+                              //   "address": address,
+                              //   "province": province,
+                              //   "bank": bank,
+                              //   "account_name": account_name,
+                              //   "account_no": account_no,
+                              //   "branch": branch,
+                              //   "profile_url": profile_url
+                              // };
 
-                              await db.updateUserData(user_data);
+                              // await db.updateUserData(user_data);
                             }
                           }),
                       const SizedBox(height: 12.0),
@@ -361,7 +341,6 @@ class _FarmerAddDataState extends State<FarmerAddData> {
                       )
                     ],
                   ),
-                )),
-          );
+                ));
   }
 }
