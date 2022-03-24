@@ -42,7 +42,13 @@ dependencies:
   flutter_spinkit: ^5.1.0
   image_picker: ^0.8.4+9
   firebase_storage: ^10.2.9
-
+  video_player: ^2.3.0
+  # flutter_datetime_picker: ^1.5.1
+  flutter_datetime_picker:
+    git:
+      url: https://github.com/Realank/flutter_datetime_picker.git
+      ref: master
+  
 dev_dependencies:
   flutter_test:
     sdk: flutter

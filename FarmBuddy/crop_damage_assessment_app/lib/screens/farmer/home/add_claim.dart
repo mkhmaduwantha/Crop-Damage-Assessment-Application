@@ -1,9 +1,11 @@
 import 'dart:io';
+import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:video_player/video_player.dart';
 import 'package:crop_damage_assessment_app/services/auth.dart';
-import 'package:crop_damage_assessment_app/services/database.dart';
 import 'package:crop_damage_assessment_app/components/loading.dart';
+import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:crop_damage_assessment_app/components/decoration.dart';
 
 class AddClaim extends StatefulWidget {
@@ -21,23 +23,48 @@ class _AddClaimState extends State<AddClaim> {
   final _formKey = GlobalKey<FormState>();
   String error = "";
   bool loading = false;
+  bool isSubmit = false;
 
   // text field state
-  String name = "";
-  String type = "farmer";
-  String email = "";
-
+  String claim_name = "";
+  String crop_type = "";
+  String reason = "";
+  String description = "";
   String agrarian_division = "";
-  String nic = "";
-  String address = "";
   String province = "";
 
-  String bank = "";
-  String account_name = "";
-  String account_no = "";
-  String branch = "";
+  String damage_area = "";
+  String estimate = "";
 
-  File? profile_image;
+  String damage_date = DateFormat("yyyy-MM-dd").format(DateTime.now());
+
+  XFile? video_file;
+  List<XFile>? image_files = <XFile>[];
+
+  late VideoPlayerController _videoPlayerController;
+
+  set _imageFile(XFile? value) {
+    if (value != null) {
+      if (image_files != null) {
+        image_files?.addAll(<XFile>[value]);
+      }
+    }
+  }
+
+  static const List<String> _cropOptions = <String>[
+    'food',
+    'feed',
+    'fiber',
+    'oil',
+    'ornamental'
+  ];
+
+  static const List<String> _reasonOptions = <String>[
+    'rain',
+    'flood',
+    'animal attack',
+    'drought'
+  ];
 
   static const List<String> _agrarianDivisionOptions = <String>[
     'galle',
@@ -53,12 +80,54 @@ class _AddClaimState extends State<AddClaim> {
   ];
 
   final picker = ImagePicker();
-  Future pickImage() async {
-    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
 
-    setState(() {
-      profile_image = File(pickedFile!.path);
-    });
+  Future getImage() async {
+    try {
+      var pickedFile = await picker.pickImage(source: ImageSource.camera);
+
+      //you can use ImageCourse.camera for Camera capture
+      if (pickedFile != null) {
+        setState(() {
+          _imageFile = pickedFile;
+        });
+      } else {
+        print("No image is selected.");
+      }
+    } catch (e) {
+      print("error while picking file.");
+    }
+  }
+
+  Future getVideo() async {
+    try {
+      var pickedFile = await picker.pickVideo(source: ImageSource.camera);
+      //you can use ImageCourse.camera for Camera capture
+      if (pickedFile != null) {
+        setState(() {
+          video_file = pickedFile;
+        });
+        // video_file = XFile(pickedFile.path);
+        _videoPlayerController =
+            VideoPlayerController.file(File(pickedFile.path))
+              ..initialize().then((_) => {setState(() {})});
+
+        _videoPlayerController.play();
+
+        print("Video is selected.");
+        print(video_file);
+
+
+      } else {
+        print("No video is selected.");
+      }
+    } catch (e) {
+      print("error while picking video - " + e.toString());
+    }
+  }
+
+  bool _isImageFileEmpty() {
+    
+    return (image_files == null ||image_files!.isEmpty) && isSubmit;
   }
 
   @override
@@ -66,281 +135,372 @@ class _AddClaimState extends State<AddClaim> {
     return loading
         ? const Loading()
         : SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 50.0),
-                child: Form(
-                  key: _formKey,
-                  child: Column(
-                    children: <Widget>[
-                      const Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          'Peronal Details',
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 20.0,
-                              color: Color.fromARGB(255, 32, 196, 100)),
-                        ),
-                      ),
-                      const SizedBox(height: 20.0),
-                      TextFormField(
-                        keyboardType: TextInputType.name,
-                        decoration:
-                            textInputDecoration.copyWith(hintText: 'Name'),
-                        validator: (val) =>
-                            val!.isEmpty ? 'Enter your name' : null,
-                        onChanged: (val) {
-                          setState(() => name = val);
-                          setState(() => error = "");
-                        },
-                      ),
-                      const SizedBox(height: 20.0),
-                      TextFormField(
-                        keyboardType: TextInputType.emailAddress,
-                        decoration:
-                            textInputDecoration.copyWith(hintText: 'Email'),
-                        validator: (val) =>
-                            val!.isEmpty ? 'Enter your email' : null,
-                        onChanged: (val) {
-                          setState(() => email = val);
-                          setState(() => error = "");
-                        },
-                      ),
-
-                      const SizedBox(height: 20.0),
-                      Autocomplete<String>(
-                          optionsBuilder: (TextEditingValue textEditingValue) {
-                        // return _agrarianDivisionOptions
-                        //   .where((String continent) => continent.toLowerCase()
-                        //     .startsWith(textEditingValue.text.toLowerCase())
-                        //   )
-                        //   .toList();
-
-                        if (textEditingValue.text == '') {
-                          return const Iterable<String>.empty();
-                        }
-                        return _agrarianDivisionOptions.where((String option) {
-                          return option
-                              .contains(textEditingValue.text.toLowerCase());
-                        });
-                      }, fieldViewBuilder: (BuildContext context,
-                              TextEditingController fieldTextEditingController,
-                              FocusNode fieldFocusNode,
-                              VoidCallback onFieldSubmitted) {
-                        return TextFormField(
-                          controller: fieldTextEditingController,
-                          focusNode: fieldFocusNode,
-                          keyboardType: TextInputType.text,
-                          decoration: textInputDecoration.copyWith(
-                              hintText: 'Agrarian Division'),
-                          validator: (val) => agrarian_division.isEmpty
-                              ? 'Select your agrarian division'
-                              : null,
-                          onChanged: (val) {
-                            setState(() => agrarian_division = "");
-                            setState(() => error = "");
-                          },
-                        );
-                      }, onSelected: (String selection) {
-                        setState(() => agrarian_division = selection);
-                        setState(() => error = "");
-                        // debugPrint('You just selected $selection');
-                      }),
-                      const SizedBox(height: 20.0),
-                      TextFormField(
-                        keyboardType: TextInputType.text,
-                        decoration:
-                            textInputDecoration.copyWith(hintText: 'NIC'),
-                        validator: (val) =>
-                            val!.isEmpty ? 'Enter your nic' : null,
-                        onChanged: (val) {
-                          setState(() => nic = val);
-                          setState(() => error = "");
-                        },
-                      ),
-                      const SizedBox(height: 20.0),
-                      TextFormField(
-                        keyboardType: TextInputType.streetAddress,
-                        decoration:
-                            textInputDecoration.copyWith(hintText: 'Address'),
-                        validator: (val) =>
-                            val!.isEmpty ? 'Enter your address' : null,
-                        onChanged: (val) {
-                          setState(() => address = val);
-                          setState(() => error = "");
-                        },
-                      ),
-                      const SizedBox(height: 20.0),
-                      Autocomplete<String>(
-                          optionsBuilder: (TextEditingValue textEditingValue) {
-                        // return _provinceOptions
-                        //   .where((String continent) => continent.toLowerCase()
-                        //     .startsWith(textEditingValue.text.toLowerCase())
-                        //   )
-                        //   .toList();
-
-                        if (textEditingValue.text == '') {
-                          return const Iterable<String>.empty();
-                        }
-                        return _provinceOptions.where((String option) {
-                          return option
-                              .contains(textEditingValue.text.toLowerCase());
-                        });
-                      }, fieldViewBuilder: (BuildContext context,
-                              TextEditingController fieldTextEditingController,
-                              FocusNode fieldFocusNode,
-                              VoidCallback onFieldSubmitted) {
-                        return TextFormField(
-                          controller: fieldTextEditingController,
-                          focusNode: fieldFocusNode,
-                          keyboardType: TextInputType.text,
-                          decoration: textInputDecoration.copyWith(
-                              hintText: 'Province'),
-                          validator: (val) =>
-                              province.isEmpty ? 'Select your province' : null,
-                          onChanged: (val) {
-                            setState(() => province = "");
-                            setState(() => error = "");
-                          },
-                        );
-                      }, onSelected: (String selection) {
-                        setState(() => province = selection);
-                        setState(() => error = "");
-                        // debugPrint('You just selected $selection');
-                      }),
-                      const SizedBox(height: 40.0),
-                      const Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          'Bank Details',
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 20.0,
-                              color: Color.fromARGB(255, 32, 196, 100)),
-                        ),
-                      ),
-                      const SizedBox(height: 20.0),
-                      TextFormField(
-                        keyboardType: TextInputType.text,
-                        decoration:
-                            textInputDecoration.copyWith(hintText: 'Bank Name'),
-                        validator: (val) =>
-                            val!.isEmpty ? 'Enter your bank name' : null,
-                        onChanged: (val) {
-                          setState(() => account_name = val);
-                          setState(() => error = "");
-                        },
-                      ),
-                      const SizedBox(height: 20.0),
-                      TextFormField(
-                        keyboardType: TextInputType.text,
-                        decoration: textInputDecoration.copyWith(
-                            hintText: 'Name in Bank Account'),
-                        validator: (val) => val!.isEmpty
-                            ? 'Enter your name in bank account'
-                            : null,
-                        onChanged: (val) {
-                          setState(() => bank = val);
-                          setState(() => error = "");
-                        },
-                      ),
-                      const SizedBox(height: 20.0),
-                      TextFormField(
-                        keyboardType: TextInputType.text,
-                        decoration: textInputDecoration.copyWith(
-                            hintText: 'Account No'),
-                        validator: (val) =>
-                            val!.isEmpty ? 'Enter your account no' : null,
-                        onChanged: (val) {
-                          setState(() => account_no = val);
-                          setState(() => error = "");
-                        },
-                      ),
-                      const SizedBox(height: 20.0),
-                      TextFormField(
-                        keyboardType: TextInputType.text,
-                        decoration: textInputDecoration.copyWith(
-                            hintText: 'Branch Name'),
-                        validator: (val) =>
-                            val!.isEmpty ? 'Enter your branch name' : null,
-                        onChanged: (val) {
-                          setState(() => branch = val);
-                          setState(() => error = "");
-                        },
-                      ),
-                      const SizedBox(height: 40.0),
-                      const Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          'Profile Image',
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 20.0,
-                              color: Color.fromARGB(255, 32, 196, 100)),
-                        ),
-                      ),
-                      const SizedBox(height: 20.0),
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(30.0),
-                        // ignore: unnecessary_null_comparison
-                        child: profile_image != null
-                            ? Image.file(profile_image!)
-                            : TextButton(
-                                child: const Icon(
-                                  Icons.add_a_photo,
-                                  size: 50,
-                                ),
-                                onPressed: pickImage,
-                              ),
-                      ),
-                      const SizedBox(height: 20.0),
-                      ElevatedButton(
-                          child: const Text('Submit'),
-                          style: ElevatedButton.styleFrom(
-                            primary: const Color.fromARGB(
-                                255, 71, 143, 75), // background
-                            onPrimary: Colors.white, // foreground
-                          ),
-                          onPressed: () async {
-                            // print("agrarian_division {$agrarian_division}");
-                            // print(agrarian_division.isEmpty);
-
-                            if (_formKey.currentState != null && _formKey.currentState!.validate()) {
-
-                              setState(() { loading = true; });
-                              DatabaseService db = DatabaseService(uid: widget.uid);
-                              String profile_url = await db.uploadImageToFirebase("profile", profile_image);
-                              
-                              // var user_data = {
-                              //   "uid": widget.uid,
-                              //   "name": name,
-                              //   "email": email,
-                              //   "type": type,
-                              //   "phone_no": widget.phone_no,
-                              //   "agrarian_division": agrarian_division,
-                              //   "nic": nic,
-                              //   "address": address,
-                              //   "province": province,
-                              //   "bank": bank,
-                              //   "account_name": account_name,
-                              //   "account_no": account_no,
-                              //   "branch": branch,
-                              //   "profile_url": profile_url
-                              // };
-
-                              // await db.updateUserData(user_data);
-                            }
-                          }),
-                      const SizedBox(height: 12.0),
-                      Text(
-                        error,
-                        style:
-                            const TextStyle(color: Colors.red, fontSize: 14.0),
-                      )
-                    ],
+            padding:
+                const EdgeInsets.symmetric(vertical: 20.0, horizontal: 50.0),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                children: <Widget>[
+                  const SizedBox(height: 20.0),
+                  TextFormField(
+                    keyboardType: TextInputType.name,
+                    decoration:
+                        textInputDecoration.copyWith(hintText: 'Claim Name'),
+                    validator: (val) =>
+                        val!.isEmpty ? 'Enter claim name' : null,
+                    onChanged: (val) {
+                      setState(() => claim_name = val);
+                      setState(() => error = "");
+                    },
                   ),
-                ));
+                  const SizedBox(height: 20.0),
+                  Autocomplete<String>(
+                      optionsBuilder: (TextEditingValue textEditingValue) {
+                    if (textEditingValue.text == '') {
+                      return const Iterable<String>.empty();
+                    }
+                    return _cropOptions.where((String option) {
+                      return option
+                          .contains(textEditingValue.text.toLowerCase());
+                    });
+                  }, fieldViewBuilder: (BuildContext context,
+                          TextEditingController fieldTextEditingController,
+                          FocusNode fieldFocusNode,
+                          VoidCallback onFieldSubmitted) {
+                    return TextFormField(
+                      controller: fieldTextEditingController,
+                      focusNode: fieldFocusNode,
+                      keyboardType: TextInputType.text,
+                      decoration:
+                          textInputDecoration.copyWith(hintText: 'Crop Type'),
+                      validator: (val) =>
+                          crop_type.isEmpty ? 'Select crop type' : null,
+                      onChanged: (val) {
+                        setState(() => crop_type = "");
+                        setState(() => error = "");
+                      },
+                    );
+                  }, onSelected: (String selection) {
+                    setState(() => crop_type = selection);
+                    setState(() => error = "");
+                    // debugPrint('You just selected $selection');
+                  }),
+                  const SizedBox(height: 20.0),
+                  Autocomplete<String>(
+                      optionsBuilder: (TextEditingValue textEditingValue) {
+                    if (textEditingValue.text == '') {
+                      return const Iterable<String>.empty();
+                    }
+                    return _reasonOptions.where((String option) {
+                      return option
+                          .contains(textEditingValue.text.toLowerCase());
+                    });
+                  }, fieldViewBuilder: (BuildContext context,
+                          TextEditingController fieldTextEditingController,
+                          FocusNode fieldFocusNode,
+                          VoidCallback onFieldSubmitted) {
+                    return TextFormField(
+                      controller: fieldTextEditingController,
+                      focusNode: fieldFocusNode,
+                      keyboardType: TextInputType.text,
+                      decoration: textInputDecoration.copyWith(
+                          hintText: 'Reason for Damage'),
+                      validator: (val) =>
+                          reason.isEmpty ? 'Select the reason' : null,
+                      onChanged: (val) {
+                        setState(() => reason = "");
+                        setState(() => error = "");
+                      },
+                    );
+                  }, onSelected: (String selection) {
+                    setState(() => reason = selection);
+                    setState(() => error = "");
+                    // debugPrint('You just selected $selection');
+                  }),
+                  const SizedBox(height: 20.0),
+                  TextFormField(
+                    keyboardType: TextInputType.text,
+                    minLines: 3,
+                    maxLines: 6,
+                    decoration:
+                        textInputDecoration.copyWith(hintText: 'Description'),
+                    validator: (val) =>
+                        val!.isEmpty ? 'Enter description' : null,
+                    onChanged: (val) {
+                      setState(() => description = val);
+                      setState(() => error = "");
+                    },
+                  ),
+                  const SizedBox(height: 20.0),
+                  Autocomplete<String>(
+                      optionsBuilder: (TextEditingValue textEditingValue) {
+                    if (textEditingValue.text == '') {
+                      return const Iterable<String>.empty();
+                    }
+                    return _agrarianDivisionOptions.where((String option) {
+                      return option
+                          .contains(textEditingValue.text.toLowerCase());
+                    });
+                  }, fieldViewBuilder: (BuildContext context,
+                          TextEditingController fieldTextEditingController,
+                          FocusNode fieldFocusNode,
+                          VoidCallback onFieldSubmitted) {
+                    return TextFormField(
+                      controller: fieldTextEditingController,
+                      focusNode: fieldFocusNode,
+                      keyboardType: TextInputType.text,
+                      decoration: textInputDecoration.copyWith(
+                          hintText: 'Agrarian Division'),
+                      validator: (val) => agrarian_division.isEmpty
+                          ? 'Select your agrarian division'
+                          : null,
+                      onChanged: (val) {
+                        setState(() => agrarian_division = "");
+                        setState(() => error = "");
+                      },
+                    );
+                  }, onSelected: (String selection) {
+                    setState(() => agrarian_division = selection);
+                    setState(() => error = "");
+                    // debugPrint('You just selected $selection');
+                  }),
+                  const SizedBox(height: 20.0),
+                  Autocomplete<String>(
+                      optionsBuilder: (TextEditingValue textEditingValue) {
+                    if (textEditingValue.text == '') {
+                      return const Iterable<String>.empty();
+                    }
+                    return _provinceOptions.where((String option) {
+                      return option
+                          .contains(textEditingValue.text.toLowerCase());
+                    });
+                  }, fieldViewBuilder: (BuildContext context,
+                          TextEditingController fieldTextEditingController,
+                          FocusNode fieldFocusNode,
+                          VoidCallback onFieldSubmitted) {
+                    return TextFormField(
+                      controller: fieldTextEditingController,
+                      focusNode: fieldFocusNode,
+                      keyboardType: TextInputType.text,
+                      decoration:
+                          textInputDecoration.copyWith(hintText: 'Province'),
+                      validator: (val) =>
+                          province.isEmpty ? 'Select your province' : null,
+                      onChanged: (val) {
+                        setState(() => province = "");
+                        setState(() => error = "");
+                      },
+                    );
+                  }, onSelected: (String selection) {
+                    setState(() => province = selection);
+                    setState(() => error = "");
+                    // debugPrint('You just selected $selection');
+                  }),
+                  const SizedBox(height: 20.0),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                        primary: Colors.transparent,
+                        elevation: 0,
+                        side: const BorderSide(
+                            color: Color.fromARGB(255, 151, 151, 151))),
+                    onPressed: () {
+                      DatePicker.showDatePicker(context,
+                          theme: const DatePickerTheme(
+                            containerHeight: 250.0,
+                          ),
+                          showTitleActions: true,
+                          maxTime: DateTime.now(), onConfirm: (date) {
+                        setState(() => damage_date =
+                            '${date.year}-${date.month}-${date.day}');
+                      }, currentTime: DateTime.now(), locale: LocaleType.en);
+                    },
+                    child: Container(
+                      alignment: Alignment.center,
+                      height: 60.0,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          const Text(
+                            "Damage Date",
+                            style: TextStyle(
+                                color: Color.fromARGB(255, 116, 115, 115),
+                                fontSize: 15.0),
+                          ),
+                          Row(
+                            children: <Widget>[
+                              Row(
+                                children: <Widget>[
+                                  Text(
+                                    " $damage_date",
+                                    style: const TextStyle(
+                                        color: Color.fromARGB(255, 10, 10, 10),
+                                        fontSize: 16.0),
+                                  ),
+                                ],
+                              )
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 20.0),
+                  TextFormField(
+                    keyboardType: TextInputType.number,
+                    decoration: textInputDecoration.copyWith(
+                        hintText: 'Damaged Area (sqft)'),
+                    validator: (val) =>
+                        val!.isEmpty ? 'Enter damage area' : null,
+                    onChanged: (val) {
+                      setState(() => damage_area = val);
+                      setState(() => error = "");
+                    },
+                  ),
+                  const SizedBox(height: 20.0),
+                  TextFormField(
+                    keyboardType: TextInputType.number,
+                    decoration: textInputDecoration.copyWith(
+                        hintText: 'Estimated Damage (LKR)'),
+                    validator: (val) => val!.isEmpty ? 'Enter estimate damage' : null,
+                    onChanged: (val) {
+                      setState(() => estimate = val);
+                      setState(() => error = "");
+                    },
+                  ),
+                  const SizedBox(height: 40.0),
+                  const Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      'Add Evidence',
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 20.0,
+                          color: Color.fromARGB(255, 32, 196, 100)),
+                    ),
+                  ),
+
+                  const SizedBox(height: 20.0),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(30.0),
+                    child: TextButton(
+                      child: const Icon(
+                        Icons.add_a_photo,
+                        size: 50,
+                      ),
+                      style: TextButton.styleFrom(
+                        primary: _isImageFileEmpty() ? Colors.red: const Color.fromARGB(255, 32, 196, 100),
+                      ),
+                      onPressed: getImage,
+                    ),
+                  ),
+
+                  Visibility(
+                    child: const Text(
+                              "Upload Image",
+                              style: TextStyle(color: Colors.red, fontSize: 14.0),
+                            ),
+                    visible: _isImageFileEmpty(),
+                  ),
+                  
+
+                  const SizedBox(height: 20.0),
+                  ClipRRect(
+                      borderRadius: BorderRadius.circular(30.0),
+                      child: image_files != null
+                          ? Wrap(
+                              children: image_files!.map((imageone) {
+                                return Card(
+                                  child: SizedBox(
+                                    height: 100,
+                                    width: 100,
+                                    child: Image.file(File(imageone.path)),
+                                  ),
+                                );
+                              }).toList(),
+                            )
+                          : Container()),
+
+                  // const SizedBox(height: 20.0),
+                  // ClipRRect(
+                  //   borderRadius: BorderRadius.circular(30.0),
+                  //   // ignore: unnecessary_null_comparison
+                  //   child: TextButton(
+                  //     child: const Icon(
+                  //       Icons.video_call_rounded,
+                  //       size: 50,
+                  //     ),
+                  //     onPressed: getVideo,
+                  //   ),
+                  // ),
+
+                  const SizedBox(height: 20.0),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(30.0),
+                    child: video_file != null
+                        ? _videoPlayerController.value.isInitialized
+                            ? AspectRatio(
+                                aspectRatio:
+                                    _videoPlayerController.value.aspectRatio,
+                                child: VideoPlayer(_videoPlayerController),
+                              )
+                            : Container()
+                        : TextButton(
+                            child: const Icon(
+                              Icons.video_call_rounded,
+                              size: 50,
+                            ),
+                            onPressed: getVideo,
+                          ),
+                  ),
+
+                  const SizedBox(height: 20.0),
+                  ElevatedButton(
+                      child: const Text('Submit'),
+                      style: ElevatedButton.styleFrom(
+                        primary: const Color.fromARGB(
+                            255, 71, 143, 75), // background
+                        onPrimary: Colors.white, // foreground
+                      ),
+                      onPressed: () async {
+                        // print("crop_type {$crop_type}");
+                        setState(() => isSubmit = true);
+                        if (_formKey.currentState != null && _formKey.currentState!.validate() && _isImageFileEmpty()) {
+
+
+
+                          setState(() {
+                            loading = true;
+                          });
+
+                          // DatabaseService db = DatabaseService(uid: widget.uid);
+                          // String profile_url = await db.uploadImageToFirebase(
+                          //     "profile", image_files);
+
+                          // var user_data = {
+                          //   "uid": widget.uid,
+                          //   "claim_name": claim_name,
+                          //   "crop_type": crop_type,
+                          //   "reason": reason,
+                          //   "description": description,
+                          //   "agrarian_division": agrarian_division,
+                          //   "province": province,
+                          //   "damage_area": damage_area,
+                          //   "estimate": estimate,
+                          //   "account_no": account_no,
+                          //   "profile_url": profile_url
+                          // };
+
+                          // await db.updateUserData(user_data);
+                        }
+                      }),
+                  const SizedBox(height: 12.0),
+                  Text(
+                    error,
+                    style: const TextStyle(color: Colors.red, fontSize: 14.0),
+                  )
+                ],
+              ),
+            ));
   }
 }
