@@ -7,7 +7,8 @@ import 'package:crop_damage_assessment_app/components/loading.dart';
 import 'package:crop_damage_assessment_app/components/decoration.dart';
 
 class FarmerAddData extends StatefulWidget {
-  const FarmerAddData({Key? key, required this.uid, required this.phone_no}) : super(key: key);
+  const FarmerAddData({Key? key, required this.uid, required this.phone_no})
+      : super(key: key);
 
   final String? uid;
   final String? phone_no;
@@ -38,7 +39,7 @@ class _FarmerAddDataState extends State<FarmerAddData> {
   String account_no = "";
   String branch = "";
 
-  File? profile_image;
+  XFile? profile_image;
 
   static const List<String> _agrarianDivisionOptions = <String>[
     'galle',
@@ -58,7 +59,8 @@ class _FarmerAddDataState extends State<FarmerAddData> {
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
 
     setState(() {
-      profile_image = File(pickedFile!.path);
+      // profile_image = File(pickedFile!.path);
+      profile_image = pickedFile;
     });
   }
 
@@ -86,7 +88,8 @@ class _FarmerAddDataState extends State<FarmerAddData> {
               ],
             ),
             body: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric( vertical: 20.0, horizontal: 50.0),
+                padding: const EdgeInsets.symmetric(
+                    vertical: 20.0, horizontal: 50.0),
                 child: Form(
                   key: _formKey,
                   child: Column(
@@ -126,7 +129,6 @@ class _FarmerAddDataState extends State<FarmerAddData> {
                           setState(() => error = "");
                         },
                       ),
-
                       const SizedBox(height: 20.0),
                       Autocomplete<String>(
                           optionsBuilder: (TextEditingValue textEditingValue) {
@@ -306,7 +308,7 @@ class _FarmerAddDataState extends State<FarmerAddData> {
                         borderRadius: BorderRadius.circular(30.0),
                         // ignore: unnecessary_null_comparison
                         child: profile_image != null
-                            ? Image.file(profile_image!)
+                            ? Image.file(File(profile_image!.path))
                             : TextButton(
                                 child: const Icon(
                                   Icons.add_a_photo,
@@ -327,12 +329,15 @@ class _FarmerAddDataState extends State<FarmerAddData> {
                             // print("agrarian_division {$agrarian_division}");
                             // print(agrarian_division.isEmpty);
 
-                            if (_formKey.currentState != null && _formKey.currentState!.validate()) {
-
-                              setState(() { loading = true; });
+                            if (_formKey.currentState != null &&
+                                _formKey.currentState!.validate()) {
+                              setState(() {
+                                loading = true;
+                              });
                               DatabaseService db = DatabaseService(uid: widget.uid);
-                              String profile_url = await db.uploadImageToFirebase("profile", profile_image);
-                              
+                              String profile_url =
+                                  await db.uploadFileToFirebase( "profile", "profile_", profile_image);
+
                               var user_data = {
                                 "uid": widget.uid,
                                 "name": name,

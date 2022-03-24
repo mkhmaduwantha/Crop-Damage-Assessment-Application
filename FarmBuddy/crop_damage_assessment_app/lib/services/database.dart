@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:path/path.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:crop_damage_assessment_app/models/user.dart';
@@ -12,6 +13,8 @@ class DatabaseService {
   // collection reference
   final CollectionReference user_collection =
       FirebaseFirestore.instance.collection('user');
+  final CollectionReference claim_collection =
+      FirebaseFirestore.instance.collection('claim');
 
   // user data from snapshots
   UserData _userDataFromSnapshot(DocumentSnapshot snapshot) {
@@ -49,16 +52,29 @@ class DatabaseService {
     });
   }
 
-  Future uploadImageToFirebase(String root, File? imageFile) async {
-    String downloadURL = "";
-    String fileName = uid! + extension(imageFile!.path);
-    try {
+  Future addClaimData(var claim_data) async {
+    bool isSuccess = false;
+    await claim_collection.add(claim_data).then((value) {
+      print("Claim Added");
+      isSuccess = true;
+    // ignore: invalid_return_type_for_catch_error
+    }).catchError((error) => print("Failed to claim data - " + error));
+    return isSuccess;
+  }
 
+  Future uploadFileToFirebase(
+      String root, String referName, XFile? imageFile) async {
+    String downloadURL = "";
+    String fileName = referName +
+        DateTime.now().millisecondsSinceEpoch.toString() +
+        extension(imageFile!.path);
+    String refer = '$root/$uid/$fileName';
+    try {
       await firebase_storage.FirebaseStorage.instance
-          .ref('$root/$fileName')
-          .putFile(imageFile);
+          .ref(refer)
+          .putFile(File(imageFile.path));
       downloadURL = await firebase_storage.FirebaseStorage.instance
-          .ref('$root/$fileName')
+          .ref(refer)
           .getDownloadURL();
       return downloadURL;
     } catch (error) {

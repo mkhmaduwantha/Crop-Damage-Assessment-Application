@@ -1,9 +1,11 @@
 import 'dart:io';
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
+import 'package:cool_alert/cool_alert.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:video_player/video_player.dart';
 import 'package:crop_damage_assessment_app/services/auth.dart';
+import 'package:crop_damage_assessment_app/services/database.dart';
 import 'package:crop_damage_assessment_app/components/loading.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:crop_damage_assessment_app/components/decoration.dart';
@@ -24,6 +26,7 @@ class _AddClaimState extends State<AddClaim> {
   String error = "";
   bool loading = false;
   bool isSubmit = false;
+  bool isSubmitComplete = false;
 
   // text field state
   String claim_name = "";
@@ -114,8 +117,6 @@ class _AddClaimState extends State<AddClaim> {
         _videoPlayerController.play();
 
         print("Video is selected.");
-        print(video_file);
-
 
       } else {
         print("No video is selected.");
@@ -126,8 +127,16 @@ class _AddClaimState extends State<AddClaim> {
   }
 
   bool _isImageFileEmpty() {
-    
-    return (image_files == null ||image_files!.isEmpty) && isSubmit;
+    return (image_files == null || image_files!.isEmpty) && isSubmit;
+  }
+
+  void _isSuccessAlert() {
+    CoolAlert.show(
+          context: context,
+          type: CoolAlertType.success,
+          text: 'Transaction completed successfully!',
+          autoCloseDuration: const Duration(seconds: 10),
+        );
   }
 
   @override
@@ -296,6 +305,7 @@ class _AddClaimState extends State<AddClaim> {
                     setState(() => error = "");
                     // debugPrint('You just selected $selection');
                   }),
+
                   const SizedBox(height: 20.0),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
@@ -361,7 +371,8 @@ class _AddClaimState extends State<AddClaim> {
                     keyboardType: TextInputType.number,
                     decoration: textInputDecoration.copyWith(
                         hintText: 'Estimated Damage (LKR)'),
-                    validator: (val) => val!.isEmpty ? 'Enter estimate damage' : null,
+                    validator: (val) =>
+                        val!.isEmpty ? 'Enter estimate damage' : null,
                     onChanged: (val) {
                       setState(() => estimate = val);
                       setState(() => error = "");
@@ -389,7 +400,9 @@ class _AddClaimState extends State<AddClaim> {
                         size: 50,
                       ),
                       style: TextButton.styleFrom(
-                        primary: _isImageFileEmpty() ? Colors.red: const Color.fromARGB(255, 32, 196, 100),
+                        primary: _isImageFileEmpty()
+                            ? Colors.red
+                            : const Color.fromARGB(255, 32, 196, 100),
                       ),
                       onPressed: getImage,
                     ),
@@ -397,12 +410,11 @@ class _AddClaimState extends State<AddClaim> {
 
                   Visibility(
                     child: const Text(
-                              "Upload Image",
-                              style: TextStyle(color: Colors.red, fontSize: 14.0),
-                            ),
+                      "Upload Image",
+                      style: TextStyle(color: Colors.red, fontSize: 14.0),
+                    ),
                     visible: _isImageFileEmpty(),
                   ),
-                  
 
                   const SizedBox(height: 20.0),
                   ClipRRect(
@@ -462,36 +474,59 @@ class _AddClaimState extends State<AddClaim> {
                             255, 71, 143, 75), // background
                         onPrimary: Colors.white, // foreground
                       ),
-                      onPressed: () async {
-                        // print("crop_type {$crop_type}");
-                        setState(() => isSubmit = true);
-                        if (_formKey.currentState != null && _formKey.currentState!.validate() && _isImageFileEmpty()) {
+                      onPressed: isSubmitComplete ? null :
+                        () async {
 
+                          setState(() => isSubmit = true);
+                          if (_formKey.currentState != null &&
+                              _formKey.currentState!.validate() &&
+                              !_isImageFileEmpty()) {
+                            setState(() {
+                              loading = true;
+                            });
 
+                            DatabaseService db = DatabaseService(uid: widget.uid);
+                            List<String>? claim_image_urls = <String>[];
+                            String claim_video_url = "";
 
-                          setState(() {
-                            loading = true;
-                          });
+                            for (XFile? img in image_files!) {
+                              String claim_image_url =
+                                  await db.uploadFileToFirebase(
+                                      "claim_image", "claim_image_", img);
+                              claim_image_urls.add(claim_image_url);
+                            }
 
-                          // DatabaseService db = DatabaseService(uid: widget.uid);
-                          // String profile_url = await db.uploadImageToFirebase(
-                          //     "profile", image_files);
+                            if (video_file != null) {
+                              claim_video_url = await db.uploadFileToFirebase(
+                                  "claim_video", "claim_video_", video_file);
+                            }
 
-                          // var user_data = {
-                          //   "uid": widget.uid,
-                          //   "claim_name": claim_name,
-                          //   "crop_type": crop_type,
-                          //   "reason": reason,
-                          //   "description": description,
-                          //   "agrarian_division": agrarian_division,
-                          //   "province": province,
-                          //   "damage_area": damage_area,
-                          //   "estimate": estimate,
-                          //   "account_no": account_no,
-                          //   "profile_url": profile_url
-                          // };
+                            var claim_data = {
+                              "uid": widget.uid,
+                              "claim_name": claim_name,
+                              "crop_type": crop_type,
+                              "reason": reason,
+                              "description": description,
+                              "agrarian_division": agrarian_division,
+                              "province": province,
+                              "damage_date": damage_date,
+                              "damage_area": damage_area,
+                              "estimate": estimate,
+                              "claim_image_urls": claim_image_urls,
+                              "claim_video_url": claim_video_url
+                            };
 
-                          // await db.updateUserData(user_data);
+                            bool isSuccess = await db.addClaimData(claim_data);
+                            if(isSuccess){
+                              _isSuccessAlert();
+                            }
+
+                            setState(() {
+                              isSubmitComplete = true;
+                              loading = false;
+                            });
+                            
+                            print("outtt - " + isSuccess.toString());
                         }
                       }),
                   const SizedBox(height: 12.0),
