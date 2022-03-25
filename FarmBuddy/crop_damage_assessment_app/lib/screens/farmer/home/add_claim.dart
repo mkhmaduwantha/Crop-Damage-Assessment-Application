@@ -160,8 +160,7 @@ class _AddClaimState extends State<AddClaim> {
     return loading
         ? const Loading()
         : SingleChildScrollView(
-            padding:
-                const EdgeInsets.symmetric(vertical: 20.0, horizontal: 50.0),
+            padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 50.0),
             child: Form(
               key: _formKey,
               child: Column(
@@ -467,8 +466,7 @@ class _AddClaimState extends State<AddClaim> {
                   ElevatedButton(
                       child: const Text('Submit'),
                       style: ElevatedButton.styleFrom(
-                        primary: const Color.fromARGB(
-                            255, 71, 143, 75), // background
+                        primary: const Color.fromARGB( 255, 71, 143, 75), // background
                         onPrimary: Colors.white, // foreground
                       ),
                       onPressed: isSubmitComplete
@@ -502,6 +500,7 @@ class _AddClaimState extends State<AddClaim> {
 
                                 var claim_data = {
                                   "uid": widget.uid,
+                                  "status": "Pending",
                                   "timestamp": DateTime.now().millisecondsSinceEpoch,
                                   "claim_name": claim_name,
                                   "crop_type": crop_type,

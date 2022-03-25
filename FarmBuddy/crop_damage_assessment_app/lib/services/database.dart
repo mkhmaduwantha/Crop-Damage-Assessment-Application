@@ -33,7 +33,8 @@ class DatabaseService {
       //print(doc.data);
       return Claim(
         uid: doc['uid'],
-        timestamp: doc['uid'] ?? 0,
+        status: doc['status'] ?? "Pending",
+        timestamp: doc['timestamp'] ?? 0,
         claim_name: doc['claim_name'] ?? "",
         crop_type: doc['crop_type'] ?? "",
         reason: doc['reason'] ?? "",
