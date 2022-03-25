@@ -2,8 +2,9 @@ import 'dart:io';
 import 'package:path/path.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
+import 'package:crop_damage_assessment_app/models/claim.dart';
 import 'package:crop_damage_assessment_app/models/user.dart';
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 
 class DatabaseService {
   final String? uid;
@@ -11,10 +12,8 @@ class DatabaseService {
   DatabaseService({required this.uid});
 
   // collection reference
-  final CollectionReference user_collection =
-      FirebaseFirestore.instance.collection('user');
-  final CollectionReference claim_collection =
-      FirebaseFirestore.instance.collection('claim');
+  final CollectionReference user_collection = FirebaseFirestore.instance.collection('user');
+  final CollectionReference claim_collection = FirebaseFirestore.instance.collection('claim');
 
   // user data from snapshots
   UserData _userDataFromSnapshot(DocumentSnapshot snapshot) {
@@ -25,6 +24,30 @@ class DatabaseService {
       email: data['email'],
       type: data['type'],
     );
+  }
+
+  // claim data from snapshots
+  List<Claim?> _claimDataFromSnapshot(QuerySnapshot snapshot) {
+
+    return snapshot.docs.map((doc){
+      //print(doc.data);
+      return Claim(
+        uid: doc['uid'],
+        timestamp: doc['uid'] ?? 0,
+        claim_name: doc['claim_name'] ?? "",
+        crop_type: doc['crop_type'] ?? "",
+        reason: doc['reason'] ?? "",
+        description: doc['description'] ?? "",
+        agrarian_division: doc['agrarian_division'] ?? "",
+        province: doc['province'] ?? "",
+        damage_date: doc['damage_date'] ?? "",
+        damage_area: doc['damage_area'] ?? "",
+        estimate: doc['estimate'] ?? "",
+        claim_image_urls: doc['claim_image_urls'] ?? "",
+        claim_video_url: doc['claim_video_url'] ?? ""
+      );
+    }).toList();
+
   }
 
   // get user doc stream
@@ -81,5 +104,9 @@ class DatabaseService {
       print(error.toString());
       return downloadURL;
     }
+  }
+
+  Stream<List<Claim?>> get farmerClaimList {
+    return claim_collection.snapshots().map(_claimDataFromSnapshot);
   }
 }
