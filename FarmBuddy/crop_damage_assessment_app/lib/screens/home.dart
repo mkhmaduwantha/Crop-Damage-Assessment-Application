@@ -4,7 +4,7 @@ import 'package:crop_damage_assessment_app/models/user.dart';
 import 'package:crop_damage_assessment_app/models/user_auth.dart';
 import 'package:crop_damage_assessment_app/services/database.dart';
 // import 'package:crop_damage_assessment_app/components/loading.dart';
-import 'package:crop_damage_assessment_app/screens/farmer/add_data.dart';
+import 'package:crop_damage_assessment_app/screens/farmer/add_farmer.dart';
 import 'package:crop_damage_assessment_app/screens/admin/admin_dashboard.dart';
 import 'package:crop_damage_assessment_app/screens/farmer/home/farmer_dashboard.dart';
 import 'package:crop_damage_assessment_app/screens/officer/home/officer_dashboard.dart';

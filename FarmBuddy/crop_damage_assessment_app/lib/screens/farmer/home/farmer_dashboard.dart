@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:crop_damage_assessment_app/services/auth.dart';
 import 'package:crop_damage_assessment_app/screens/farmer/home/add_claim.dart';
-import 'package:crop_damage_assessment_app/screens/farmer/home/view_claim.dart';
+import 'package:crop_damage_assessment_app/screens/farmer/home/view_claim_list.dart';
 
 class FarmerDashboard extends StatelessWidget {
   FarmerDashboard({Key? key, required this.uid}) : super(key: key);
@@ -16,13 +16,14 @@ class FarmerDashboard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return StreamProvider<List<Claim?>>.value(
-      value: DatabaseService(uid: uid).farmerClaimList,
-      initialData: const [],
-      child: DefaultTabController(
-      length: 2,
-      child: Scaffold(
-          body: NestedScrollView(
-            headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
+        value: DatabaseService(uid: uid).farmerClaimList,
+        initialData: const [],
+        child: DefaultTabController(
+          length: 2,
+          child: Scaffold(
+              body: NestedScrollView(
+            headerSliverBuilder:
+                (BuildContext context, bool innerBoxIsScrolled) {
               return <Widget>[
                 SliverAppBar(
                   title: const Text('Farm Buddy - Farmer Dashboard'),
@@ -52,11 +53,11 @@ class FarmerDashboard extends StatelessWidget {
                   ),
                 ),
               ];
-        },
-        body: TabBarView(
-          children: <Widget>[ViewClaim(uid: uid), AddClaim(uid: uid)],
-        ),
-      )),
-    ));
+            },
+            body: TabBarView(
+              children: <Widget>[ViewClaims(uid: uid), AddClaim(uid: uid)],
+            ),
+          )),
+        ));
   }
 }

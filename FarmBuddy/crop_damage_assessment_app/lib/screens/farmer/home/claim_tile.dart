@@ -44,7 +44,7 @@ class ClaimTile extends StatelessWidget {
                   if (claim_snapshot.hasData) {
                     return claim_snapshot.requireData;
                   } else {
-                    return const Text('LOADING...');
+                    return const Text('Loading Image...');
                   }
                 },
               ),

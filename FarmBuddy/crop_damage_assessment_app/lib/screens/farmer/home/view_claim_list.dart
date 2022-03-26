@@ -4,8 +4,8 @@ import 'package:crop_damage_assessment_app/models/claim.dart';
 import 'package:crop_damage_assessment_app/components/loading.dart';
 import 'package:crop_damage_assessment_app/screens/farmer/home/claim_tile.dart';
 
-class ViewClaim extends StatefulWidget {
-  const ViewClaim({Key? key, required this.uid}) : super(key: key);
+class ViewClaims extends StatefulWidget {
+  const ViewClaims({Key? key, required this.uid}) : super(key: key);
 
   final String? uid;
 
@@ -13,16 +13,12 @@ class ViewClaim extends StatefulWidget {
   _AddClaimState createState() => _AddClaimState();
 }
 
-class _AddClaimState extends State<ViewClaim> {
+class _AddClaimState extends State<ViewClaims> {
   bool loading = false;
 
   @override
   Widget build(BuildContext context) {
     final claims = Provider.of<List<Claim?>>(context);
-
-    // claims.forEach((element) {
-    //   print(element!.status);
-    // });
 
     return loading
         ? const Loading()
