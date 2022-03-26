@@ -1,19 +1,21 @@
+import 'package:crop_damage_assessment_app/models/user.dart';
+import 'package:crop_damage_assessment_app/services/database.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:crop_damage_assessment_app/models/claim.dart';
 import 'package:crop_damage_assessment_app/components/loading.dart';
 import 'package:crop_damage_assessment_app/screens/farmer/home/claim_tile.dart';
 
-class ViewClaims extends StatefulWidget {
-  const ViewClaims({Key? key, required this.uid}) : super(key: key);
+class ViewClaimList extends StatefulWidget {
+  const ViewClaimList({Key? key, required this.uid}) : super(key: key);
 
   final String? uid;
 
   @override
-  _AddClaimState createState() => _AddClaimState();
+  _ViewClaimListState createState() => _ViewClaimListState();
 }
 
-class _AddClaimState extends State<ViewClaims> {
+class _ViewClaimListState extends State<ViewClaimList> {
   bool loading = false;
 
   @override
@@ -23,8 +25,7 @@ class _AddClaimState extends State<ViewClaims> {
     return loading
         ? const Loading()
         : Container(
-            padding:
-                const EdgeInsets.symmetric(vertical: 20.0, horizontal: 30.0),
+            padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 30.0),
             child: ListView.builder(
               itemCount: claims.length,
               itemBuilder: (context, index) {

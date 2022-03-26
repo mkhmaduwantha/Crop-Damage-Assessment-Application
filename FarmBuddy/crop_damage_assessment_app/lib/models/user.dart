@@ -1,13 +1,13 @@
 class UserData {
-  final String? uid;
-  final String? name;
-  final String? email;
-  final String? type;
+  final String uid;
+  final String name;
+  final String email;
+  final String type;
 
   UserData({
-    this.uid, 
-    this.name, 
-    this.email,
-    this.type
+    required this.uid, 
+    required this.name, 
+    required this.email,
+    required this.type
   });
 }

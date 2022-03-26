@@ -47,7 +47,7 @@ class FarmerDashboard extends StatelessWidget {
                       color: const Color.fromARGB(255, 74, 236, 128),
                     ),
                     tabs: const [
-                      Tab(child: Text('View Claim')),
+                      Tab(child: Text('View Claims')),
                       Tab(child: Text('Add Claim'))
                     ],
                   ),
@@ -55,7 +55,7 @@ class FarmerDashboard extends StatelessWidget {
               ];
             },
             body: TabBarView(
-              children: <Widget>[ViewClaims(uid: uid), AddClaim(uid: uid)],
+              children: <Widget>[ViewClaimList(uid: uid), AddClaim(uid: uid)],
             ),
           )),
         ));

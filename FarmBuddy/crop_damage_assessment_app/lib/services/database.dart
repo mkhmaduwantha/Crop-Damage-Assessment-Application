@@ -12,14 +12,16 @@ class DatabaseService {
   DatabaseService({required this.uid});
 
   // collection reference
-  final CollectionReference user_collection = FirebaseFirestore.instance.collection('user');
-  final CollectionReference claim_collection = FirebaseFirestore.instance.collection('claim');
+  final CollectionReference user_collection =
+      FirebaseFirestore.instance.collection('user');
+  final CollectionReference claim_collection =
+      FirebaseFirestore.instance.collection('claim');
 
   // user data from snapshots
   UserData _userDataFromSnapshot(DocumentSnapshot snapshot) {
     Map<String, dynamic> data = snapshot.data()! as Map<String, dynamic>;
     return UserData(
-      uid: uid,
+      uid: data['uid'],
       name: data['name'],
       email: data['email'],
       type: data['type'],
@@ -28,27 +30,24 @@ class DatabaseService {
 
   // claim data from snapshots
   List<Claim?> _claimDataFromSnapshot(QuerySnapshot snapshot) {
-
-    return snapshot.docs.map((doc){
+    return snapshot.docs.map((doc) {
       //print(doc.data);
       return Claim(
-        uid: doc['uid'],
-        status: doc['status'] ?? "Pending",
-        timestamp: doc['timestamp'] ?? 0,
-        claim_name: doc['claim_name'] ?? "",
-        crop_type: doc['crop_type'] ?? "",
-        reason: doc['reason'] ?? "",
-        description: doc['description'] ?? "",
-        agrarian_division: doc['agrarian_division'] ?? "",
-        province: doc['province'] ?? "",
-        damage_date: doc['damage_date'] ?? "",
-        damage_area: doc['damage_area'] ?? "",
-        estimate: doc['estimate'] ?? "",
-        claim_image_urls: doc['claim_image_urls'] ?? "",
-        claim_video_url: doc['claim_video_url'] ?? ""
-      );
+          uid: doc['uid'],
+          status: doc['status'] ?? "Pending",
+          timestamp: doc['timestamp'] ?? 0,
+          claim_name: doc['claim_name'] ?? "",
+          crop_type: doc['crop_type'] ?? "",
+          reason: doc['reason'] ?? "",
+          description: doc['description'] ?? "",
+          agrarian_division: doc['agrarian_division'] ?? "",
+          province: doc['province'] ?? "",
+          damage_date: doc['damage_date'] ?? "",
+          damage_area: doc['damage_area'] ?? "",
+          estimate: doc['estimate'] ?? "",
+          claim_image_urls: doc['claim_image_urls'] ?? "",
+          claim_video_url: doc['claim_video_url'] ?? "");
     }).toList();
-
   }
 
   // get user doc stream
@@ -63,17 +62,27 @@ class DatabaseService {
         .set(user_data, SetOptions(merge: true));
   }
 
-  Future getUserData() async {
+  Future getUserData(String? select_uid) async {
+    UserData? user;
     await user_collection
-        .doc(uid)
+        .doc(select_uid)
         .get()
         .then((DocumentSnapshot documentSnapshot) {
-      if (documentSnapshot.exists) {
-        print('Document data: ${documentSnapshot.data()}');
-      } else {
-        print('Document does not exist on the database');
-      }
-    });
+          if (documentSnapshot.exists) {
+            Map<String, dynamic> data =  documentSnapshot.data() as Map<String, dynamic>;
+            user = UserData(
+              uid: data['uid'] ?? "",
+              name: data['name'] ?? "",
+              email: data['email'] ?? "",
+              type: data['type'] ?? "",
+            );
+          } else {
+            print('User does not exist on the database');
+          }
+        });
+    
+    return user;
+
   }
 
   Future addClaimData(var claim_data) async {
@@ -81,7 +90,7 @@ class DatabaseService {
     await claim_collection.add(claim_data).then((value) {
       print("Claim Added");
       isSuccess = true;
-    // ignore: invalid_return_type_for_catch_error
+      // ignore: invalid_return_type_for_catch_error
     }).catchError((error) => print("Failed to claim data - " + error));
     return isSuccess;
   }
