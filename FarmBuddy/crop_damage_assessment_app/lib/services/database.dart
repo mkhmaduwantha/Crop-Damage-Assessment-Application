@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:crop_damage_assessment_app/models/farmer.dart';
 import 'package:path/path.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -45,7 +46,7 @@ class DatabaseService {
           damage_date: doc['damage_date'] ?? "",
           damage_area: doc['damage_area'] ?? "",
           estimate: doc['estimate'] ?? "",
-          claim_image_urls: doc['claim_image_urls'] ?? "",
+          claim_image_urls: doc['claim_image_urls'] ?? [],
           claim_video_url: doc['claim_video_url'] ?? "");
     }).toList();
   }
@@ -63,18 +64,27 @@ class DatabaseService {
   }
 
   Future getUserData(String? select_uid) async {
-    UserData? user;
+    Farmer? user;
     await user_collection
         .doc(select_uid)
         .get()
         .then((DocumentSnapshot documentSnapshot) {
           if (documentSnapshot.exists) {
             Map<String, dynamic> data =  documentSnapshot.data() as Map<String, dynamic>;
-            user = UserData(
+            user = Farmer(
               uid: data['uid'] ?? "",
               name: data['name'] ?? "",
               email: data['email'] ?? "",
               type: data['type'] ?? "",
+              agrarian_division: data['agrarian_division'] ?? "",
+              nic: data['nic'] ?? "",
+              address: data['address'] ?? "",
+              province: data['province'] ?? "",
+              bank: data['bank'] ?? "",
+              account_name: data['account_name'] ?? "",
+              account_no: data['account_no'] ?? "",
+              branch: data['branch'] ?? "",
+              profile_url: data['profile_url'] ?? ""
             );
           } else {
             print('User does not exist on the database');

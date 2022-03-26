@@ -1,4 +1,5 @@
 import 'package:crop_damage_assessment_app/screens/farmer/home/claim_profile.dart';
+import 'package:crop_damage_assessment_app/screens/farmer/home/claim_view.dart';
 import 'package:crop_damage_assessment_app/services/database.dart';
 import 'package:flutter/material.dart';
 import 'package:crop_damage_assessment_app/models/claim.dart';
@@ -55,7 +56,7 @@ class _ClaimPanelState extends State<ClaimPanel> {
         },
         body: TabBarView(
           children: <Widget>[
-            Text('View claim - ' + widget.claim!.claim_name),
+            ClaimView(claim: widget.claim),
             ClaimProfile(uid: widget.claim!.uid, claim_uid: widget.claim!.uid)
           ],
         ),
