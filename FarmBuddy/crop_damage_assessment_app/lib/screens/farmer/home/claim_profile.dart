@@ -48,10 +48,27 @@ class _ClaimProfileState extends State<ClaimProfile> {
                 children: <Widget>[
 
                   const SizedBox(height: 20.0),
+                  CircleAvatar(
+                    backgroundImage: NetworkImage(user!.profile_url),
+                    radius: 100,
+                  ),
+
+                  const SizedBox(height: 20.0),
                   Align(
                     alignment: Alignment.center,
                     child: Text(
-                      user!.name + "\n" + user!.email,
+                      user!.name,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18.0,
+                          color: Color.fromARGB(255, 80, 79, 79)),
+                    ),
+                  ),
+                  Align(
+                    alignment: Alignment.center,
+                    child: Text(
+                      user!.email,
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
                           fontWeight: FontWeight.bold,
