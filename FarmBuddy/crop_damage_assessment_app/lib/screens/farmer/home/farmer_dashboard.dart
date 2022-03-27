@@ -7,16 +7,36 @@ import 'package:crop_damage_assessment_app/services/auth.dart';
 import 'package:crop_damage_assessment_app/screens/farmer/home/add_claim.dart';
 import 'package:crop_damage_assessment_app/screens/farmer/home/view_claim_list.dart';
 
-class FarmerDashboard extends StatelessWidget {
-  FarmerDashboard({Key? key, required this.uid}) : super(key: key);
+class FarmerDashboard extends StatefulWidget {
+  const FarmerDashboard({Key? key, required this.uid}) : super(key: key);
 
   final String? uid;
+
+  @override
+  _FarmerDashboardState createState() => _FarmerDashboardState();
+}
+
+class _FarmerDashboardState extends State<FarmerDashboard> {
   final AuthService _auth = AuthService();
+  late DatabaseService db;
+
+  void initFarmer() async {
+    db = DatabaseService(uid: widget.uid);
+    // db.select_uid = widget.uid;
+    db.set_select_uid = widget.uid!;
+    
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    initFarmer();
+  }
 
   @override
   Widget build(BuildContext context) {
     return StreamProvider<List<Claim?>>.value(
-        value: DatabaseService(uid: uid).farmerClaimList,
+        value: db.farmerClaimList,
         initialData: const [],
         child: DefaultTabController(
           length: 2,
@@ -55,7 +75,10 @@ class FarmerDashboard extends StatelessWidget {
               ];
             },
             body: TabBarView(
-              children: <Widget>[ViewClaimList(uid: uid), AddClaim(uid: uid)],
+              children: <Widget>[
+                ViewClaimList(uid: widget.uid),
+                AddClaim(uid: widget.uid)
+              ],
             ),
           )),
         ));

@@ -1,12 +1,14 @@
 import 'dart:async';
-import 'package:crop_damage_assessment_app/screens/farmer/home/claim_panel.dart';
 import 'package:flutter/material.dart';
+import 'package:timeago/timeago.dart' as timeago;
 import 'package:crop_damage_assessment_app/models/claim.dart';
+import 'package:crop_damage_assessment_app/screens/farmer/home/claim_panel.dart';
 
 class ClaimTile extends StatelessWidget {
   final Claim? claim;
 
   const ClaimTile({Key? key, required this.claim}) : super(key: key);
+  // var fifteenAgo = DateTime.now().subtract(const Duration(minutes: 15));
 
   Future<Widget> getImage() async {
     final Completer<Widget> completer = Completer();
@@ -53,8 +55,42 @@ class ClaimTile extends StatelessWidget {
             ),
 
             ListTile(
-              title: Text(claim!.claim_name),
-              subtitle: Text("Crop Type - " + claim!.crop_type + "\nReason - " + claim!.reason),
+              isThreeLine : true,
+              title: Text(claim!.claim_name, 
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16.0,
+                          color: Color.fromARGB(255, 0, 0, 0)
+                        )
+                      ),
+
+              subtitle: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      "Crop Type - " + claim!.crop_type + "\nReason - " + claim!.reason,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                          fontSize: 15.0,
+                          color: Color.fromARGB(255, 0, 0, 0)),
+                    ),
+                  ),
+
+                  const SizedBox(height: 10.0),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      timeago.format(DateTime.fromMillisecondsSinceEpoch(claim!.timestamp)),
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                          fontSize: 13.0,
+                          color: Color.fromARGB(255, 109, 108, 108)),
+                    ),
+                  ),
+                ],
+              ),
               trailing: Text(claim!.status),
               onTap: () {
                 Navigator.push(

@@ -9,8 +9,13 @@ import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 
 class DatabaseService {
   final String? uid;
+  late String? select_uid;
 
   DatabaseService({required this.uid});
+
+  set set_select_uid(String select_uid) {
+    this.select_uid = select_uid;
+  }
 
   // collection reference
   final CollectionReference user_collection =
@@ -69,30 +74,29 @@ class DatabaseService {
         .doc(select_uid)
         .get()
         .then((DocumentSnapshot documentSnapshot) {
-          if (documentSnapshot.exists) {
-            Map<String, dynamic> data =  documentSnapshot.data() as Map<String, dynamic>;
-            user = Farmer(
-              uid: data['uid'] ?? "",
-              name: data['name'] ?? "",
-              email: data['email'] ?? "",
-              type: data['type'] ?? "",
-              agrarian_division: data['agrarian_division'] ?? "",
-              nic: data['nic'] ?? "",
-              address: data['address'] ?? "",
-              province: data['province'] ?? "",
-              bank: data['bank'] ?? "",
-              account_name: data['account_name'] ?? "",
-              account_no: data['account_no'] ?? "",
-              branch: data['branch'] ?? "",
-              profile_url: data['profile_url'] ?? ""
-            );
-          } else {
-            print('User does not exist on the database');
-          }
-        });
-    
-    return user;
+      if (documentSnapshot.exists) {
+        Map<String, dynamic> data =
+            documentSnapshot.data() as Map<String, dynamic>;
+        user = Farmer(
+            uid: data['uid'] ?? "",
+            name: data['name'] ?? "",
+            email: data['email'] ?? "",
+            type: data['type'] ?? "",
+            agrarian_division: data['agrarian_division'] ?? "",
+            nic: data['nic'] ?? "",
+            address: data['address'] ?? "",
+            province: data['province'] ?? "",
+            bank: data['bank'] ?? "",
+            account_name: data['account_name'] ?? "",
+            account_no: data['account_no'] ?? "",
+            branch: data['branch'] ?? "",
+            profile_url: data['profile_url'] ?? "");
+      } else {
+        print('User does not exist on the database');
+      }
+    });
 
+    return user;
   }
 
   Future addClaimData(var claim_data) async {
@@ -127,6 +131,11 @@ class DatabaseService {
   }
 
   Stream<List<Claim?>> get farmerClaimList {
-    return claim_collection.snapshots().map(_claimDataFromSnapshot);
+    print("select_uid - " + select_uid!);
+    return claim_collection
+        .orderBy('timestamp', descending: true)
+        .where('uid', isEqualTo: select_uid)
+        .snapshots()
+        .map(_claimDataFromSnapshot);
   }
 }
