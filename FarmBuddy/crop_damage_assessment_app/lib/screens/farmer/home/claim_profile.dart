@@ -94,6 +94,9 @@ class _ClaimProfileState extends State<ClaimProfile> {
                   Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
+                                            
+                      "Phone No - " + 
+                      user!.phone_no + 
                       
                       "\nAgrarian Division - " + 
                       user!.agrarian_division + 

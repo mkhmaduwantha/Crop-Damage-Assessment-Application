@@ -1,5 +1,6 @@
 class Farmer {
   final String uid;
+  final String phone_no;
   final String name;
   final String email;
   final String type;
@@ -15,6 +16,7 @@ class Farmer {
 
   Farmer({
     required this.uid, 
+    required this.phone_no, 
     required this.name, 
     required this.email,
     required this.type,

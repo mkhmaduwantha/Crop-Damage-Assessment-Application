@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:crop_damage_assessment_app/models/farmer.dart';
 import 'package:path/path.dart';
+import 'package:latlng/latlng.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:crop_damage_assessment_app/models/claim.dart';
@@ -37,7 +38,7 @@ class DatabaseService {
   // claim data from snapshots
   List<Claim?> _claimDataFromSnapshot(QuerySnapshot snapshot) {
     return snapshot.docs.map((doc) {
-      //print(doc.data);
+
       return Claim(
           uid: doc['uid'],
           status: doc['status'] ?? "Pending",
@@ -52,7 +53,8 @@ class DatabaseService {
           damage_area: doc['damage_area'] ?? "",
           estimate: doc['estimate'] ?? "",
           claim_image_urls: doc['claim_image_urls'] ?? [],
-          claim_video_url: doc['claim_video_url'] ?? "");
+          claim_video_url: doc['claim_video_url'] ?? "",
+          claim_location: LatLng(doc['claim_location'].latitude, doc['claim_location'].longitude));
     }).toList();
   }
 
@@ -63,12 +65,20 @@ class DatabaseService {
   }
 
   Future updateUserData(var user_data) async {
-    return await user_collection
+    bool isSuccess = false;
+    await user_collection
         .doc(uid)
-        .set(user_data, SetOptions(merge: true));
+        .set(user_data, SetOptions(merge: true))
+        .then((value) {
+      print("User Added/Updated");
+      isSuccess = true;
+    })
+        // ignore: invalid_return_type_for_catch_error
+        .catchError((error) => print("Failed to add user: $error"));
+    return isSuccess;
   }
 
-  Future getUserData(String? select_uid) async {
+  Future<Farmer?> getUserData(String? select_uid) async {
     Farmer? user;
     await user_collection
         .doc(select_uid)
@@ -79,6 +89,7 @@ class DatabaseService {
             documentSnapshot.data() as Map<String, dynamic>;
         user = Farmer(
             uid: data['uid'] ?? "",
+            phone_no: data['phone_no'] ?? "",
             name: data['name'] ?? "",
             email: data['email'] ?? "",
             type: data['type'] ?? "",
@@ -103,6 +114,7 @@ class DatabaseService {
     bool isSuccess = false;
     await claim_collection.add(claim_data).then((value) {
       print("Claim Added");
+      print(claim_data);
       isSuccess = true;
       // ignore: invalid_return_type_for_catch_error
     }).catchError((error) => print("Failed to claim data - " + error));

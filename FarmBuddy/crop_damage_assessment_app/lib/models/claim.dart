@@ -1,3 +1,5 @@
+import 'package:latlng/latlng.dart';
+
 class Claim {
   final String uid;
   final String status;
@@ -13,6 +15,7 @@ class Claim {
   final String estimate;
   final List<dynamic> claim_image_urls;
   final String claim_video_url;
+  final LatLng claim_location;
 
   Claim({
     required this.uid,
@@ -28,6 +31,7 @@ class Claim {
     required this.damage_area,
     required this.estimate,
     required this.claim_image_urls,
-    required this.claim_video_url
+    required this.claim_video_url,
+    required this.claim_location
   });
 }

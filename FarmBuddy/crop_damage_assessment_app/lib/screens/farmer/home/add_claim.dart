@@ -1,15 +1,18 @@
 import 'dart:io';
-import 'package:crop_damage_assessment_app/screens/farmer/home/farmer_dashboard.dart';
 import 'package:intl/intl.dart';
+import 'package:latlng/latlng.dart';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:cool_alert/cool_alert.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:video_player/video_player.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:crop_damage_assessment_app/services/auth.dart';
 import 'package:crop_damage_assessment_app/services/database.dart';
 import 'package:crop_damage_assessment_app/components/loading.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:crop_damage_assessment_app/components/decoration.dart';
+import 'package:crop_damage_assessment_app/screens/farmer/home/farmer_dashboard.dart';
 
 class AddClaim extends StatefulWidget {
   const AddClaim({Key? key, required this.uid}) : super(key: key);
@@ -47,11 +50,20 @@ class _AddClaimState extends State<AddClaim> {
 
   late VideoPlayerController _videoPlayerController;
 
+  List<LatLng> locations = <LatLng>[];
+  bool isLocationEnabled = false;
+
   set _imageFile(XFile? value) {
     if (value != null) {
       if (image_files != null) {
         image_files?.addAll(<XFile>[value]);
       }
+    }
+  }
+
+  set _locations(LatLng? value) {
+    if (value != null) {
+      locations.addAll(<LatLng>[value]);
     }
   }
 
@@ -87,47 +99,102 @@ class _AddClaimState extends State<AddClaim> {
 
   Future getImage() async {
     try {
-      var pickedFile = await picker.pickImage(source: ImageSource.camera);
+      await getUserLocation();
 
-      //you can use ImageCourse.camera for Camera capture
-      if (pickedFile != null) {
-        setState(() {
-          _imageFile = pickedFile;
-        });
+      if (isLocationEnabled) {
+        var pickedFile = await picker.pickImage(source: ImageSource.camera);
+        if (pickedFile != null) {
+          setState(() {
+            _imageFile = pickedFile;
+          });
+        } else {
+          print("No image is selected.");
+        }
       } else {
-        print("No image is selected.");
+        triggerWarningAlert("Please enable location service to continue");
       }
     } catch (e) {
-      print("error while picking file.");
+      print("error while picking file. " + e.toString());
+      triggerWarningAlert(e.toString());
     }
   }
 
   Future getVideo() async {
     try {
-      var pickedFile = await picker.pickVideo(source: ImageSource.camera);
-      //you can use ImageCourse.camera for Camera capture
-      if (pickedFile != null) {
-        setState(() {
-          video_file = pickedFile;
-        });
-        // video_file = XFile(pickedFile.path);
-        _videoPlayerController =
-            VideoPlayerController.file(File(pickedFile.path))
-              ..initialize().then((_) => {setState(() {})});
+      await getUserLocation();
 
-        _videoPlayerController.play();
+      if (isLocationEnabled) {
+        var pickedFile = await picker.pickVideo(source: ImageSource.camera);
+        if (pickedFile != null) {
+          setState(() {
+            video_file = pickedFile;
+          });
+          // video_file = XFile(pickedFile.path);
+          _videoPlayerController =
+              VideoPlayerController.file(File(pickedFile.path))
+                ..initialize().then((_) => {setState(() {})});
 
-        print("Video is selected.");
-      } else {
-        print("No video is selected.");
+          _videoPlayerController.play();
+
+          print("Video is selected.");
+        } else {
+          print("No video is selected.");
+        }
+      } else{
+        triggerWarningAlert("Please enable location service to continue");
       }
     } catch (e) {
       print("error while picking video - " + e.toString());
+      triggerWarningAlert(e.toString());
     }
   }
 
   bool _isImageFileEmpty() {
     return (image_files == null || image_files!.isEmpty) && isSubmit;
+  }
+
+  Future<Position> _determinePosition() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      setState(() {
+        isLocationEnabled = false;
+      });
+      return Future.error('Location services are disabled.');
+    }
+
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        setState(() {
+          isLocationEnabled = false;
+        });
+        return Future.error('Location permissions are denied');
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      setState(() {
+        isLocationEnabled = false;
+      });
+      return Future.error(
+          'Location permissions are permanently denied, we cannot request permissions.');
+    }
+
+    setState(() {
+      isLocationEnabled = true;
+    });
+    return await Geolocator.getCurrentPosition();
+  }
+
+  getUserLocation() async {
+    Position currentLocation = await _determinePosition();
+    setState(() {
+      _locations = LatLng(currentLocation.latitude, currentLocation.longitude);
+    });
   }
 
   void triggerSuccessAlert() {
@@ -149,10 +216,24 @@ class _AddClaimState extends State<AddClaim> {
         onCancelBtnTap: () => closeAlert());
   }
 
+  void triggerWarningAlert(var message) {
+    CoolAlert.show(
+        context: context,
+        type: CoolAlertType.warning,
+        text: message,
+        loopAnimation: false,
+        onCancelBtnTap: () => closeWarningAlert());
+  }
+
   void closeAlert() {
-    Navigator.pushReplacement(context, 
-      MaterialPageRoute(builder: (context) => FarmerDashboard(uid: widget.uid))
-    );
+    Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+            builder: (context) => FarmerDashboard(uid: widget.uid)));
+  }
+
+  void closeWarningAlert() {
+    return;
   }
 
   @override
@@ -160,7 +241,8 @@ class _AddClaimState extends State<AddClaim> {
     return loading
         ? const Loading()
         : SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 50.0),
+            padding:
+                const EdgeInsets.symmetric(vertical: 20.0, horizontal: 50.0),
             child: Form(
               key: _formKey,
               child: Column(
@@ -466,13 +548,13 @@ class _AddClaimState extends State<AddClaim> {
                   ElevatedButton(
                       child: const Text('Submit'),
                       style: ElevatedButton.styleFrom(
-                        primary: const Color.fromARGB( 255, 71, 143, 75), // background
+                        primary: const Color.fromARGB(
+                            255, 71, 143, 75), // background
                         onPrimary: Colors.white, // foreground
                       ),
                       onPressed: isSubmitComplete
                           ? null
                           : () async {
-
                               setState(() => isSubmit = true);
                               if (_formKey.currentState != null &&
                                   _formKey.currentState!.validate() &&
@@ -481,12 +563,26 @@ class _AddClaimState extends State<AddClaim> {
                                   loading = true;
                                 });
 
-                                DatabaseService db = DatabaseService(uid: widget.uid);
+                                DatabaseService db =
+                                    DatabaseService(uid: widget.uid);
                                 List<String>? claim_image_urls = <String>[];
                                 String claim_video_url = "";
+                                var latitude_mean = 0.0;
+                                var longitude_mean = 0.0;
+
+                                latitude_mean = locations
+                                        .map((location) => location.latitude)
+                                        .reduce((a, b) => a + b) /
+                                    locations.length;
+                                longitude_mean = locations
+                                        .map((location) => location.longitude)
+                                        .reduce((a, b) => a + b) /
+                                    locations.length;
 
                                 for (XFile? img in image_files!) {
-                                  String claim_image_url = await db.uploadFileToFirebase( "claim_image", "claim_image_", img);
+                                  String claim_image_url =
+                                      await db.uploadFileToFirebase(
+                                          "claim_image", "claim_image_", img);
                                   claim_image_urls.add(claim_image_url);
                                 }
 
@@ -512,7 +608,10 @@ class _AddClaimState extends State<AddClaim> {
                                   "damage_area": damage_area,
                                   "estimate": estimate,
                                   "claim_image_urls": claim_image_urls,
-                                  "claim_video_url": claim_video_url
+                                  "claim_video_url": claim_video_url,
+                                  "claim_location": GeoPoint(latitude_mean, longitude_mean),
+                                  "approved_by": "",
+                                  "comment": ""
                                 };
 
                                 bool isSuccess =

@@ -163,7 +163,9 @@ class _ClaimProfileState extends State<ClaimView> {
                   "\nDamage Area - " +
                   widget.claim!.damage_area +
                   "\nEstimated Damage - " +
-                  widget.claim!.estimate,
+                  widget.claim!.estimate + 
+                  "\nEstimated Location - " +
+                  widget.claim!.claim_location.latitude.toString() + " : " + widget.claim!.claim_location.longitude.toString(),
               overflow: TextOverflow.ellipsis,
               style: const TextStyle(
                   fontWeight: FontWeight.bold,
