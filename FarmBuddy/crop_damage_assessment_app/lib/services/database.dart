@@ -11,6 +11,8 @@ import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 class DatabaseService {
   final String? uid;
   late String? select_uid;
+  // String? select_claim_state;
+  // String? select_agrarian_division;
 
   DatabaseService({required this.uid});
 
@@ -18,11 +20,17 @@ class DatabaseService {
     this.select_uid = select_uid;
   }
 
+  // set set_select_claim_state(String select_claim_state) {
+  //   this.select_claim_state = select_claim_state;
+  // }
+
+  // set set_select_agrarian_division(String select_agrarian_division) {
+  //   this.select_agrarian_division = select_agrarian_division;
+  // }
+
   // collection reference
-  final CollectionReference user_collection =
-      FirebaseFirestore.instance.collection('user');
-  final CollectionReference claim_collection =
-      FirebaseFirestore.instance.collection('claim');
+  final CollectionReference user_collection = FirebaseFirestore.instance.collection('user');
+  final CollectionReference claim_collection = FirebaseFirestore.instance.collection('claim');
 
   // user data from snapshots
   UserData _userDataFromSnapshot(DocumentSnapshot snapshot) {
@@ -85,8 +93,7 @@ class DatabaseService {
         .get()
         .then((DocumentSnapshot documentSnapshot) {
       if (documentSnapshot.exists) {
-        Map<String, dynamic> data =
-            documentSnapshot.data() as Map<String, dynamic>;
+        Map<String, dynamic> data = documentSnapshot.data() as Map<String, dynamic>;
         user = Farmer(
             uid: data['uid'] ?? "",
             phone_no: data['phone_no'] ?? "",
@@ -121,12 +128,9 @@ class DatabaseService {
     return isSuccess;
   }
 
-  Future uploadFileToFirebase(
-      String root, String referName, XFile? imageFile) async {
+  Future uploadFileToFirebase( String root, String referName, XFile? imageFile) async {
     String downloadURL = "";
-    String fileName = referName +
-        DateTime.now().millisecondsSinceEpoch.toString() +
-        extension(imageFile!.path);
+    String fileName = referName + DateTime.now().millisecondsSinceEpoch.toString() + extension(imageFile!.path);
     String refer = '$root/$uid/$fileName';
     try {
       await firebase_storage.FirebaseStorage.instance
@@ -147,6 +151,17 @@ class DatabaseService {
     return claim_collection
         .orderBy('timestamp', descending: true)
         .where('uid', isEqualTo: select_uid)
+        .snapshots()
+        .map(_claimDataFromSnapshot);
+  }
+
+  Stream<List<Claim?>> officerClaimList(String select_claim_state, String select_agrarian_division) {
+    print("select claim_state - " + select_claim_state);
+    print("select agrarian_division - " + select_agrarian_division);
+    return claim_collection
+        .orderBy('timestamp', descending: true)
+        .where('status', isEqualTo: select_claim_state)
+        .where('agrarian_division', isEqualTo: select_agrarian_division)
         .snapshots()
         .map(_claimDataFromSnapshot);
   }

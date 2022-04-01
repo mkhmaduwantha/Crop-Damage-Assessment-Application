@@ -1,10 +1,10 @@
-import 'package:crop_damage_assessment_app/screens/farmer/home/edit_farmer.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:crop_damage_assessment_app/models/claim.dart';
 import 'package:crop_damage_assessment_app/services/auth.dart';
 import 'package:crop_damage_assessment_app/services/database.dart';
 import 'package:crop_damage_assessment_app/screens/farmer/home/add_claim.dart';
+import 'package:crop_damage_assessment_app/screens/farmer/home/edit_farmer.dart';
 import 'package:crop_damage_assessment_app/screens/farmer/home/view_claim_list.dart';
 
 class FarmerDashboard extends StatefulWidget {
@@ -45,8 +45,8 @@ class _FarmerDashboardState extends State<FarmerDashboard> {
                 headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
                   return <Widget>[
                     SliverAppBar(
-                      title: const Text('Farm Buddy - Farmer Dashboard'),
-                      backgroundColor: const Color.fromARGB(255, 105, 184, 109),
+                      title: const Text('Farm Buddy - Farmer'),
+                      backgroundColor: Color.fromARGB(255, 44, 53, 44),
                       elevation: 0.0,
                       // automaticallyImplyLeading: false,
                       actions: <Widget>[

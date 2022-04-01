@@ -26,10 +26,11 @@ class Home extends StatelessWidget {
 
             switch (user?.type) {
               case 'farmer':
-                // return FarmerDashboard(key: key);
                 return FarmerDashboard(uid: user_auth?.uid);
               case 'officer':
-                return OfficerDashboard(key: key);
+
+                var filter = {"claim_state" : "Pending", "agrarian_division": "galle"};
+                return OfficerDashboard(uid: user_auth?.uid, filter: filter );
               case 'admin':
                 return AdminDashboard(key: key);
               default:

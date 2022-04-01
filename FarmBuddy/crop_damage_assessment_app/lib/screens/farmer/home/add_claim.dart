@@ -228,8 +228,8 @@ class _AddClaimState extends State<AddClaim> {
   void closeAlert() {
     Navigator.pushReplacement(
         context,
-        MaterialPageRoute(
-            builder: (context) => FarmerDashboard(uid: widget.uid)));
+        MaterialPageRoute( builder: (context) => FarmerDashboard(uid: widget.uid))
+    );
   }
 
   void closeWarningAlert() {
@@ -241,8 +241,7 @@ class _AddClaimState extends State<AddClaim> {
     return loading
         ? const Loading()
         : SingleChildScrollView(
-            padding:
-                const EdgeInsets.symmetric(vertical: 20.0, horizontal: 50.0),
+            padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 50.0),
             child: Form(
               key: _formKey,
               child: Column(
@@ -250,8 +249,7 @@ class _AddClaimState extends State<AddClaim> {
                   const SizedBox(height: 20.0),
                   TextFormField(
                     keyboardType: TextInputType.name,
-                    decoration:
-                        textInputDecoration.copyWith(hintText: 'Claim Name'),
+                    decoration: textInputDecoration.copyWith(hintText: 'Claim Name'),
                     validator: (val) =>
                         val!.isEmpty ? 'Enter claim name' : null,
                     onChanged: (val) {
@@ -556,15 +554,12 @@ class _AddClaimState extends State<AddClaim> {
                           ? null
                           : () async {
                               setState(() => isSubmit = true);
-                              if (_formKey.currentState != null &&
-                                  _formKey.currentState!.validate() &&
-                                  !_isImageFileEmpty()) {
+                              if (_formKey.currentState != null && _formKey.currentState!.validate() && !_isImageFileEmpty()) {
                                 setState(() {
                                   loading = true;
                                 });
 
-                                DatabaseService db =
-                                    DatabaseService(uid: widget.uid);
+                                DatabaseService db = DatabaseService(uid: widget.uid);
                                 List<String>? claim_image_urls = <String>[];
                                 String claim_video_url = "";
                                 var latitude_mean = 0.0;
@@ -580,18 +575,12 @@ class _AddClaimState extends State<AddClaim> {
                                     locations.length;
 
                                 for (XFile? img in image_files!) {
-                                  String claim_image_url =
-                                      await db.uploadFileToFirebase(
-                                          "claim_image", "claim_image_", img);
+                                  String claim_image_url = await db.uploadFileToFirebase( "claim_image", "claim_image_", img);
                                   claim_image_urls.add(claim_image_url);
                                 }
 
                                 if (video_file != null) {
-                                  claim_video_url =
-                                      await db.uploadFileToFirebase(
-                                          "claim_video",
-                                          "claim_video_",
-                                          video_file);
+                                  claim_video_url = await db.uploadFileToFirebase( "claim_video", "claim_video_", video_file);
                                 }
 
                                 var claim_data = {
@@ -614,8 +603,7 @@ class _AddClaimState extends State<AddClaim> {
                                   "comment": ""
                                 };
 
-                                bool isSuccess =
-                                    await db.addClaimData(claim_data);
+                                bool isSuccess = await db.addClaimData(claim_data);
 
                                 setState(() {
                                   isSubmitComplete = true;
