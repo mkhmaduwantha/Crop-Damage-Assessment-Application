@@ -3,14 +3,34 @@ import 'package:provider/provider.dart';
 import 'package:crop_damage_assessment_app/models/user.dart';
 import 'package:crop_damage_assessment_app/models/user_auth.dart';
 import 'package:crop_damage_assessment_app/services/database.dart';
-// import 'package:crop_damage_assessment_app/components/loading.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:crop_damage_assessment_app/screens/farmer/add_farmer.dart';
 import 'package:crop_damage_assessment_app/screens/admin/admin_dashboard.dart';
 import 'package:crop_damage_assessment_app/screens/farmer/home/farmer_dashboard.dart';
 import 'package:crop_damage_assessment_app/screens/officer/home/officer_dashboard.dart';
 
-class Home extends StatelessWidget {
+class Home extends StatefulWidget {
   const Home({Key? key}) : super(key: key);
+
+  @override
+  _HomeState createState() => _HomeState();
+
+}
+
+class _HomeState extends State<Home> {
+
+  void initHome() async {
+    print("init officer");
+    final preference = await SharedPreferences.getInstance();
+    await preference.setString("claim_state", "Pending");
+    await preference.setString("agrarian_division", "galle");
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    initHome();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,16 +48,18 @@ class Home extends StatelessWidget {
               case 'farmer':
                 return FarmerDashboard(uid: user_auth?.uid);
               case 'officer':
+                return OfficerDashboard(uid: user_auth?.uid);
 
-                var filter = {"claim_state" : "Pending", "agrarian_division": "galle"};
-                return OfficerDashboard(uid: user_auth?.uid, filter: filter );
               case 'admin':
-                return AdminDashboard(key: key);
+                return AdminDashboard(key: widget.key);
+
               default:
-                return FarmerAddData(uid: user_auth?.uid, phone_no: user_auth?.phone_no);
+                return FarmerAddData(
+                    uid: user_auth?.uid, phone_no: user_auth?.phone_no);
             }
           } else {
-            return FarmerAddData(uid: user_auth?.uid, phone_no: user_auth?.phone_no);
+            return FarmerAddData(
+                uid: user_auth?.uid, phone_no: user_auth?.phone_no);
           }
         });
   }

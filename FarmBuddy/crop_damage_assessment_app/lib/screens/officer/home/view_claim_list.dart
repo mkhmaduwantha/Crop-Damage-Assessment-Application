@@ -19,7 +19,6 @@ class _ViewClaimListState extends State<ViewClaimList> {
   @override
   Widget build(BuildContext context) {
     final claims = Provider.of<List<Claim?>>(context);
-    print("claims.length" + claims.length.toString());
 
     return loading
         ? const Loading()

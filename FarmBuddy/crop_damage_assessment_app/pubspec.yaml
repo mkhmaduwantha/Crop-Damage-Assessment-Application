@@ -49,6 +49,7 @@ dependencies:
   geolocator: ^8.2.0
   latlng: any
   # flutter_datetime_picker: ^1.5.1
+  shared_preferences: ^2.0.13
   flutter_datetime_picker:
     git:
       url: https://github.com/Realank/flutter_datetime_picker.git

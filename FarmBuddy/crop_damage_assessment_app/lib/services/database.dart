@@ -155,9 +155,9 @@ class DatabaseService {
         .map(_claimDataFromSnapshot);
   }
 
-  Stream<List<Claim?>> officerClaimList(String select_claim_state, String select_agrarian_division) {
-    print("select claim_state - " + select_claim_state);
-    print("select agrarian_division - " + select_agrarian_division);
+  Stream<List<Claim?>> officerClaimList(String? select_claim_state, String? select_agrarian_division) {
+    print("select claim_state - " + select_claim_state!);
+    print("select agrarian_division - " + select_agrarian_division!);
     return claim_collection
         .orderBy('timestamp', descending: true)
         .where('status', isEqualTo: select_claim_state)

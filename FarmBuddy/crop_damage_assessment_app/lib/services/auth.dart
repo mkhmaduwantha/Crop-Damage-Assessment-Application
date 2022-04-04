@@ -1,5 +1,7 @@
+import 'package:crop_damage_assessment_app/screens/authenticate/authenticate.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:crop_damage_assessment_app/models/user_auth.dart';
+import 'package:flutter/material.dart';
 
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -64,6 +66,31 @@ class AuthService {
   Future signout() async {
     try {
       return await _auth.signOut();
+    } catch (e) {
+      print(e.toString());
+      return null;
+    }
+  }
+
+  //sign out
+  Future signoutUser(BuildContext context) async {
+    try {
+      await _auth.signOut();
+      _auth.authStateChanges().listen((User? user) {
+        if (user == null) {
+          print('User is currently signed out!');
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) =>
+              const Authenticate())
+          );
+        } else {
+          print('User is signed in!');
+          return;
+        }
+      });
+
     } catch (e) {
       print(e.toString());
       return null;

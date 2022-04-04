@@ -53,7 +53,7 @@ class _FarmerDashboardState extends State<FarmerDashboard> {
                         IconButton(
                             icon: const Icon(Icons.power_settings_new),
                             onPressed: () async {
-                              await _auth.signout();
+                              await _auth.signoutUser(context);
                             })
                       ],
                       pinned: true,
@@ -104,7 +104,7 @@ class _FarmerDashboardState extends State<FarmerDashboard> {
                   ListTile(
                     title: const Text('Logout'),
                     onTap: () async {
-                      await _auth.signout();
+                      await _auth.signoutUser(context);
                     },
                   ),
                 ],
