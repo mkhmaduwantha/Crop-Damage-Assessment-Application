@@ -20,7 +20,6 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
 
   void initHome() async {
-    print("init officer");
     final preference = await SharedPreferences.getInstance();
     await preference.setString("claim_state", "Pending");
     await preference.setString("agrarian_division", "galle");
@@ -54,8 +53,7 @@ class _HomeState extends State<Home> {
                 return AdminDashboard(key: widget.key);
 
               default:
-                return FarmerAddData(
-                    uid: user_auth?.uid, phone_no: user_auth?.phone_no);
+                return FarmerAddData(uid: user_auth?.uid, phone_no: user_auth?.phone_no);
             }
           } else {
             return FarmerAddData(

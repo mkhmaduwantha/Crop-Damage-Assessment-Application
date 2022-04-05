@@ -1,15 +1,12 @@
-import 'dart:async';
-
-import 'package:crop_damage_assessment_app/components/loading.dart';
-import 'package:crop_damage_assessment_app/screens/officer/home/view_claim_list.dart';
-import 'package:crop_damage_assessment_app/screens/officer/home/filter.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:path/path.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:crop_damage_assessment_app/models/claim.dart';
 import 'package:crop_damage_assessment_app/services/auth.dart';
 import 'package:crop_damage_assessment_app/services/database.dart';
+import 'package:crop_damage_assessment_app/components/loading.dart';
+import 'package:crop_damage_assessment_app/screens/officer/home/filter.dart';
+import 'package:crop_damage_assessment_app/screens/officer/home/view_claim_list.dart';
 
 class OfficerDashboard extends StatefulWidget {
   const OfficerDashboard({Key? key, required this.uid}) : super(key: key);
@@ -24,8 +21,6 @@ class _OfficerDashboardState extends State<OfficerDashboard> {
   final AuthService _auth = AuthService();
   late DatabaseService db;
   bool loading = true;
-  final StreamController<List<Claim?>> controller =
-      StreamController<List<Claim?>>();
 
   var filter = {"claim_state": "", "agrarian_division": ""};
 
@@ -35,19 +30,13 @@ class _OfficerDashboardState extends State<OfficerDashboard> {
 
     final preference = await SharedPreferences.getInstance();
     filter["claim_state"] = preference.getString('claim_state') ?? "Pending";
-    filter["agrarian_division"] =
-        preference.getString('agrarian_division') ?? "galle";
+    filter["agrarian_division"] = preference.getString('agrarian_division') ?? "galle";
     setState(() {
       loading = false;
     });
   }
 
   // void _showSettingsPanel(BuildContext context) {
-  //     Navigator.pushReplacement(
-  //       context,
-  //       MaterialPageRoute(
-  //           builder: (context) => Filter(uid: widget.uid)));
-  //   // print(ModalRoute.of(context)!.settings.name);
   //   // showModalBottomSheet(
   //   //     context: context,
   //   //     isScrollControlled: true,
@@ -72,8 +61,7 @@ class _OfficerDashboardState extends State<OfficerDashboard> {
     return loading
         ? const Loading()
         : StreamProvider<List<Claim?>>.value(
-            value: db.officerClaimList(
-                filter["claim_state"], filter["agrarian_division"]),
+            value: db.officerClaimList(filter["claim_state"], filter["agrarian_division"]),
             initialData: const [],
             child: Scaffold(
               body: NestedScrollView(
@@ -120,7 +108,6 @@ class _OfficerDashboardState extends State<OfficerDashboard> {
                                 builder: (context) => Filter(uid: widget.uid)));
 
                         if (filter_result! && filter_result) {
-                          // (context as Element).rebuild();
                           Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(

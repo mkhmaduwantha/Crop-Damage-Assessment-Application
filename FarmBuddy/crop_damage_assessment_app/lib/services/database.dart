@@ -11,8 +11,6 @@ import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 class DatabaseService {
   final String? uid;
   late String? select_uid;
-  // String? select_claim_state;
-  // String? select_agrarian_division;
 
   DatabaseService({required this.uid});
 
@@ -20,13 +18,6 @@ class DatabaseService {
     this.select_uid = select_uid;
   }
 
-  // set set_select_claim_state(String select_claim_state) {
-  //   this.select_claim_state = select_claim_state;
-  // }
-
-  // set set_select_agrarian_division(String select_agrarian_division) {
-  //   this.select_agrarian_division = select_agrarian_division;
-  // }
 
   // collection reference
   final CollectionReference user_collection =
@@ -180,19 +171,19 @@ class DatabaseService {
     }
   }
 
-  Stream<List<Claim?>> get farmerClaimList {
-    print("select_uid - " + select_uid!);
+  Stream<List<Claim?>> farmerClaimList(String? select_claim_state) {
+    print("select_uidt - " + select_uid!);
+    print("select_claim_state - " + select_claim_state!);
     return claim_collection
         .orderBy('timestamp', descending: true)
         .where('uid', isEqualTo: select_uid)
+        .where('status', isEqualTo: select_claim_state)
         .snapshots()
         .map(_claimDataFromSnapshot);
   }
 
-  Stream<List<Claim?>> officerClaimList(
-      String? select_claim_state, String? select_agrarian_division) {
-    print("select claim_state - " + select_claim_state!);
-    print("select agrarian_division - " + select_agrarian_division!);
+  Stream<List<Claim?>> officerClaimList( String? select_claim_state, String? select_agrarian_division) {
+
     return claim_collection
         .orderBy('timestamp', descending: true)
         .where('status', isEqualTo: select_claim_state)
