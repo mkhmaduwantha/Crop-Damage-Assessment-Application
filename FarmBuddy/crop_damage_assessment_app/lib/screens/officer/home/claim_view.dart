@@ -85,8 +85,12 @@ class _ClaimProfileState extends State<ClaimView> {
       _videoPlayerController.initialize();
     }
 
-    currentState = widget.claim!.status;
-    comment = widget.claim!.comment;
+    setState(() {
+      currentState = widget.claim!.status;
+      comment = widget.claim!.comment;
+    });
+
+    // print(object);
 
   }
 
@@ -253,6 +257,7 @@ class _ClaimProfileState extends State<ClaimView> {
                   maxLines: 6,
                   decoration:
                   textInputDecoration.copyWith(hintText: 'Comment'),
+                  initialValue: comment,
                   onChanged: (val) {
                     setState(() => comment = val);
                   },

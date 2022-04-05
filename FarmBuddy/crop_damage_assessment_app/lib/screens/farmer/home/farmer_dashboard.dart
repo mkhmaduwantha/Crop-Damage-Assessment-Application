@@ -46,7 +46,7 @@ class _FarmerDashboardState extends State<FarmerDashboard> {
                 return <Widget>[
                   SliverAppBar(
                     title: const Text('Farm Buddy - Farmer'),
-                    backgroundColor: Color.fromARGB(255, 44, 53, 44),
+                    backgroundColor: const Color.fromARGB(255, 122, 156, 122),
                     elevation: 0.0,
                     // automaticallyImplyLeading: false,
                     actions: <Widget>[
@@ -63,7 +63,7 @@ class _FarmerDashboardState extends State<FarmerDashboard> {
                       indicatorPadding: const EdgeInsets.all(10),
                       indicator: BoxDecoration(
                         borderRadius: BorderRadius.circular(3),
-                        color: const Color.fromARGB(255, 74, 236, 128),
+                        color: const Color.fromARGB(255, 53, 92, 66),
                       ),
                       tabs: const [
                         Tab(child: Text('View Claims')),

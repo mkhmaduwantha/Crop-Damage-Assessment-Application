@@ -34,6 +34,18 @@ class DatabaseService {
   final CollectionReference claim_collection =
       FirebaseFirestore.instance.collection('claim');
 
+  String getString(QueryDocumentSnapshot doc, String field) {
+    return doc.data().toString().contains(field) ? doc.get(field) : "";
+  }
+
+  int getInt(QueryDocumentSnapshot doc, String field) {
+    return doc.data().toString().contains(field) ? doc.get(field) : 0;
+  }
+
+  double getDouble(QueryDocumentSnapshot doc, String field) {
+    return doc.data().toString().contains(field) ? doc.get(field) : 0.0;
+  }
+
   // user data from snapshots
   UserData _userDataFromSnapshot(DocumentSnapshot snapshot) {
     Map<String, dynamic> data = snapshot.data()! as Map<String, dynamic>;
@@ -47,29 +59,26 @@ class DatabaseService {
 
   // claim data from snapshots
   List<Claim?> _claimDataFromSnapshot(QuerySnapshot snapshot) {
-    print("getting claim 1");
     return snapshot.docs.map((doc) {
-      print("getting claim 2");
       return Claim(
         claim_id: doc.reference.id,
-        uid: doc['uid'],
-        status: doc['status'] ?? "Pending",
-        timestamp: doc['timestamp'] ?? 0,
-        claim_name: doc['claim_name'] ?? "",
-        crop_type: doc['crop_type'] ?? "",
-        reason: doc['reason'] ?? "",
-        description: doc['description'] ?? "",
-        agrarian_division: doc['agrarian_division'] ?? "",
-        province: doc['province'] ?? "",
-        damage_date: doc['damage_date'] ?? "",
-        damage_area: doc['damage_area'] ?? "",
-        estimate: doc['estimate'] ?? "",
+        uid: getString(doc, "uid"),
+        status: getString(doc, "status"),
+        timestamp: getInt(doc, "timestamp"),
+        claim_name: getString(doc, "claim_name"),
+        crop_type: getString(doc, "crop_type"),
+        reason: getString(doc, "reason"),
+        description: getString(doc, "description"),
+        agrarian_division: getString(doc, "agrarian_division"),
+        province: getString(doc, "province"),
+        damage_date: getString(doc, "damage_date"),
+        damage_area: getString(doc, "damage_area"),
+        estimate: getString(doc, "estimate"),
         claim_image_urls: doc['claim_image_urls'] ?? [],
-        claim_video_url: doc['claim_video_url'] ?? "",
-        claim_location: LatLng(
-          doc['claim_location'].latitude, doc['claim_location'].longitude),
-        comment: "",
-        approved_by: "",
+        claim_video_url: getString(doc, "claim_video_url"),
+        claim_location: LatLng(doc['claim_location'].latitude, doc['claim_location'].longitude),
+        comment: getString(doc, "comment"),
+        approved_by: getString(doc, "approved_by"),
       );
     }).toList();
   }
@@ -101,8 +110,7 @@ class DatabaseService {
         .get()
         .then((DocumentSnapshot documentSnapshot) {
       if (documentSnapshot.exists) {
-        Map<String, dynamic> data =
-            documentSnapshot.data() as Map<String, dynamic>;
+        Map<String, dynamic> data = documentSnapshot.data() as Map<String, dynamic>;
         user = Farmer(
             uid: data['uid'] ?? "",
             phone_no: data['phone_no'] ?? "",
