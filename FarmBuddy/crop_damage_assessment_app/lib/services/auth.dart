@@ -1,4 +1,4 @@
-import 'package:crop_damage_assessment_app/screens/authenticate/authenticate.dart';
+import 'package:crop_damage_assessment_app/screens/wrapper.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:crop_damage_assessment_app/models/user_auth.dart';
 import 'package:flutter/material.dart';
@@ -73,24 +73,39 @@ class AuthService {
   }
 
   //sign out
-  Future signoutUser(BuildContext context) async {
+  Future signoutUser(Key? key, BuildContext context) async {
     try {
       await _auth.signOut();
-      _auth.authStateChanges().listen((User? user) {
-        if (user == null) {
-          print('User is currently signed out!');
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) =>
-              const Authenticate())
-          );
-        } else {
-          print('User is signed in!');
-          return;
-        }
-      });
 
+      if (_auth.currentUser == null) {
+        print('User is currently signed out!');
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => Wrapper(key: key)
+          )
+        );
+      } else {
+        print('User is signed in!');
+        return;
+      }
+
+
+      // _auth.authStateChanges().listen((User? user) {
+      //   if (user == null) {
+      //     print('User is currently signed out!');
+      //     Navigator.pushReplacement(
+      //       context,
+      //       MaterialPageRoute(
+      //         builder: (context) =>
+      //         const Authenticate())
+      //     );
+      //   } else {
+      //     print('User is signed in!');
+      //     return;
+      //   }
+      // });
+      // return;
     } catch (e) {
       print(e.toString());
       return null;

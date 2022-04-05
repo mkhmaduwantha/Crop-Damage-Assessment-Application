@@ -21,10 +21,9 @@ class _FarmerDashboardState extends State<FarmerDashboard> {
   late DatabaseService db;
 
   void initFarmer() async {
+    print("init farmer");
     db = DatabaseService(uid: widget.uid);
-    // db.select_uid = widget.uid;
     db.set_select_uid = widget.uid!;
-    
   }
 
   @override
@@ -41,48 +40,47 @@ class _FarmerDashboardState extends State<FarmerDashboard> {
         child: DefaultTabController(
           length: 2,
           child: Scaffold(
-              body: NestedScrollView(
-                headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
-                  return <Widget>[
-                    SliverAppBar(
-                      title: const Text('Farm Buddy - Farmer'),
-                      backgroundColor: Color.fromARGB(255, 44, 53, 44),
-                      elevation: 0.0,
-                      // automaticallyImplyLeading: false,
-                      actions: <Widget>[
-                        IconButton(
-                            icon: const Icon(Icons.power_settings_new),
-                            onPressed: () async {
-                              await _auth.signoutUser(context);
-                            })
-                      ],
-                      pinned: true,
-                      floating: true,
-                      bottom: TabBar(
-                        isScrollable: true,
-                        indicatorPadding: const EdgeInsets.all(10),
-                        indicator: BoxDecoration(
-                          borderRadius: BorderRadius.circular(3),
-                          color: const Color.fromARGB(255, 74, 236, 128),
-                        ),
-                        tabs: const [
-                          Tab(child: Text('View Claims')),
-                          Tab(child: Text('Add Claim'))
-                        ],
+            body: NestedScrollView(
+              headerSliverBuilder:
+                  (BuildContext context, bool innerBoxIsScrolled) {
+                return <Widget>[
+                  SliverAppBar(
+                    title: const Text('Farm Buddy - Farmer'),
+                    backgroundColor: Color.fromARGB(255, 44, 53, 44),
+                    elevation: 0.0,
+                    // automaticallyImplyLeading: false,
+                    actions: <Widget>[
+                      IconButton(
+                          icon: const Icon(Icons.power_settings_new),
+                          onPressed: () async {
+                            await _auth.signoutUser(widget.key, context);
+                          })
+                    ],
+                    pinned: true,
+                    floating: true,
+                    bottom: TabBar(
+                      isScrollable: true,
+                      indicatorPadding: const EdgeInsets.all(10),
+                      indicator: BoxDecoration(
+                        borderRadius: BorderRadius.circular(3),
+                        color: const Color.fromARGB(255, 74, 236, 128),
                       ),
+                      tabs: const [
+                        Tab(child: Text('View Claims')),
+                        Tab(child: Text('Add Claim'))
+                      ],
                     ),
-                  ];
-                },
-                body: TabBarView(
-                  children: <Widget>[
-                    ViewClaimList(uid: widget.uid),
-                    AddClaim(uid: widget.uid)
-                  ],
-                ),
+                  ),
+                ];
+              },
+              body: TabBarView(
+                children: <Widget>[
+                  ViewClaimList(uid: widget.uid),
+                  AddClaim(uid: widget.uid)
+                ],
               ),
-
-              drawer: Drawer(
-
+            ),
+            drawer: Drawer(
               child: ListView(
                 padding: EdgeInsets.zero,
                 children: [
@@ -97,14 +95,16 @@ class _FarmerDashboardState extends State<FarmerDashboard> {
                     onTap: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => FarmerEditData(uid: widget.uid)),
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                FarmerEditData(uid: widget.uid)),
                       );
                     },
                   ),
                   ListTile(
                     title: const Text('Logout'),
                     onTap: () async {
-                      await _auth.signoutUser(context);
+                      await _auth.signoutUser(widget.key, context);
                     },
                   ),
                 ],

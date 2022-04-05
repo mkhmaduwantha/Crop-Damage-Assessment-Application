@@ -82,10 +82,10 @@ class _FilterState extends State<Filter> {
                 DropdownButtonFormField(
                   value: currentState,
                   decoration: textInputDecoration,
-                  items: claim_states.map((sugar) {
+                  items: claim_states.map((claim_state_option) {
                     return DropdownMenuItem(
-                      value: sugar,
-                      child: Text(sugar),
+                      value: claim_state_option,
+                      child: Text(claim_state_option),
                     );
                   }).toList(),
                   onChanged: (String? newValue) {
@@ -136,17 +136,19 @@ class _FilterState extends State<Filter> {
                       style: TextStyle(color: Colors.white),
                     ),
                     onPressed: () async {
-                      if (_formKey.currentState != null &&
-                          _formKey.currentState!.validate()) {
+                      if (_formKey.currentState != null &&  _formKey.currentState!.validate()) {
                         final preference = await SharedPreferences.getInstance();
                         await preference.setString("claim_state", currentState);
                         await preference.setString( "agrarian_division", agrarian_division);
+                        var filter = {"claim_state": currentState, "agrarian_division": agrarian_division};
+                        
+                        Navigator.pop(context, true);
 
-                        Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) =>
-                                    OfficerDashboard(uid: widget.uid)));
+                        // Navigator.pushReplacement(
+                        //     context,
+                        //     MaterialPageRoute(
+                        //         builder: (context) =>
+                        //             OfficerDashboard(uid: widget.uid)));
                         
                         // Navigator.popAndPushNamed(context, "/");
                       }

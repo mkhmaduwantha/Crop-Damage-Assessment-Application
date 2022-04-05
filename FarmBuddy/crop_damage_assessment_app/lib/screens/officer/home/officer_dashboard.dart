@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:crop_damage_assessment_app/components/loading.dart';
 import 'package:crop_damage_assessment_app/screens/officer/home/view_claim_list.dart';
 import 'package:crop_damage_assessment_app/screens/officer/home/filter.dart';
@@ -22,6 +24,8 @@ class _OfficerDashboardState extends State<OfficerDashboard> {
   final AuthService _auth = AuthService();
   late DatabaseService db;
   bool loading = true;
+  final StreamController<List<Claim?>> controller =
+      StreamController<List<Claim?>>();
 
   var filter = {"claim_state": "", "agrarian_division": ""};
 
@@ -31,7 +35,8 @@ class _OfficerDashboardState extends State<OfficerDashboard> {
 
     final preference = await SharedPreferences.getInstance();
     filter["claim_state"] = preference.getString('claim_state') ?? "Pending";
-    filter["agrarian_division"] = preference.getString('agrarian_division') ?? "galle";
+    filter["agrarian_division"] =
+        preference.getString('agrarian_division') ?? "galle";
     setState(() {
       loading = false;
     });
@@ -88,7 +93,7 @@ class _OfficerDashboardState extends State<OfficerDashboard> {
                             IconButton(
                                 icon: const Icon(Icons.power_settings_new),
                                 onPressed: () async {
-                                  await _auth.signoutUser(context);
+                                  await _auth.signoutUser(widget.key, context);
                                 }),
                           ],
                           pinned: true,
@@ -108,17 +113,25 @@ class _OfficerDashboardState extends State<OfficerDashboard> {
                     ),
                     ListTile(
                       title: const Text('Settings'),
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => Filter(uid: widget.uid)),
-                        );
+                      onTap: () async {
+                        final filter_result = await Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => Filter(uid: widget.uid)));
+
+                        if (filter_result! && filter_result) {
+                          // (context as Element).rebuild();
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                                builder: (BuildContext context) => super.widget));
+                        }
                       },
                     ),
                     ListTile(
                       title: const Text('Logout'),
                       onTap: () async {
-                        await _auth.signoutUser(context);
+                        await _auth.signoutUser(widget.key, context);
                       },
                     ),
                   ],

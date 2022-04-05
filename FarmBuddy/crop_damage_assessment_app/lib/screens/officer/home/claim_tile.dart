@@ -6,8 +6,9 @@ import 'package:crop_damage_assessment_app/screens/officer/home/claim_panel.dart
 
 class ClaimTile extends StatelessWidget {
   final Claim? claim;
+  final String? uid;
 
-  const ClaimTile({Key? key, required this.claim}) : super(key: key);
+  const ClaimTile({Key? key, required this.uid, required this.claim}) : super(key: key);
 
   Future<Widget> getImage() async {
     final Completer<Widget> completer = Completer();
@@ -94,7 +95,7 @@ class ClaimTile extends StatelessWidget {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => ClaimPanel(claim:claim)),
+                  MaterialPageRoute(builder: (context) => ClaimPanel(uid: uid, claim:claim)),
                 );
               },
             ),

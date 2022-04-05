@@ -164,6 +164,9 @@ class _SignInState extends State<SignIn> {
         await auth_in.signInWithCredential(credential).then((value) {
           print("You are logged in successfully");
         });
+        setState(() {
+          loading = false;
+        });
       },
       verificationFailed: (FirebaseAuthException e) {
         setState(() {

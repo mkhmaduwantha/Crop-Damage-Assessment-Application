@@ -27,7 +27,7 @@ class _ViewClaimListState extends State<ViewClaimList> {
             child: ListView.builder(
               itemCount: claims.length,
               itemBuilder: (context, index) {
-                return ClaimTile(claim: claims[index]);
+                return ClaimTile(uid: widget.uid, claim: claims[index]);
               },
             ));
   }

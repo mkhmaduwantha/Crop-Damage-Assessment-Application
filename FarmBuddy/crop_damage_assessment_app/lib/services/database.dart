@@ -29,8 +29,10 @@ class DatabaseService {
   // }
 
   // collection reference
-  final CollectionReference user_collection = FirebaseFirestore.instance.collection('user');
-  final CollectionReference claim_collection = FirebaseFirestore.instance.collection('claim');
+  final CollectionReference user_collection =
+      FirebaseFirestore.instance.collection('user');
+  final CollectionReference claim_collection =
+      FirebaseFirestore.instance.collection('claim');
 
   // user data from snapshots
   UserData _userDataFromSnapshot(DocumentSnapshot snapshot) {
@@ -45,24 +47,30 @@ class DatabaseService {
 
   // claim data from snapshots
   List<Claim?> _claimDataFromSnapshot(QuerySnapshot snapshot) {
+    print("getting claim 1");
     return snapshot.docs.map((doc) {
-
+      print("getting claim 2");
       return Claim(
-          uid: doc['uid'],
-          status: doc['status'] ?? "Pending",
-          timestamp: doc['timestamp'] ?? 0,
-          claim_name: doc['claim_name'] ?? "",
-          crop_type: doc['crop_type'] ?? "",
-          reason: doc['reason'] ?? "",
-          description: doc['description'] ?? "",
-          agrarian_division: doc['agrarian_division'] ?? "",
-          province: doc['province'] ?? "",
-          damage_date: doc['damage_date'] ?? "",
-          damage_area: doc['damage_area'] ?? "",
-          estimate: doc['estimate'] ?? "",
-          claim_image_urls: doc['claim_image_urls'] ?? [],
-          claim_video_url: doc['claim_video_url'] ?? "",
-          claim_location: LatLng(doc['claim_location'].latitude, doc['claim_location'].longitude));
+        claim_id: doc.reference.id,
+        uid: doc['uid'],
+        status: doc['status'] ?? "Pending",
+        timestamp: doc['timestamp'] ?? 0,
+        claim_name: doc['claim_name'] ?? "",
+        crop_type: doc['crop_type'] ?? "",
+        reason: doc['reason'] ?? "",
+        description: doc['description'] ?? "",
+        agrarian_division: doc['agrarian_division'] ?? "",
+        province: doc['province'] ?? "",
+        damage_date: doc['damage_date'] ?? "",
+        damage_area: doc['damage_area'] ?? "",
+        estimate: doc['estimate'] ?? "",
+        claim_image_urls: doc['claim_image_urls'] ?? [],
+        claim_video_url: doc['claim_video_url'] ?? "",
+        claim_location: LatLng(
+          doc['claim_location'].latitude, doc['claim_location'].longitude),
+        comment: "",
+        approved_by: "",
+      );
     }).toList();
   }
 
@@ -93,7 +101,8 @@ class DatabaseService {
         .get()
         .then((DocumentSnapshot documentSnapshot) {
       if (documentSnapshot.exists) {
-        Map<String, dynamic> data = documentSnapshot.data() as Map<String, dynamic>;
+        Map<String, dynamic> data =
+            documentSnapshot.data() as Map<String, dynamic>;
         user = Farmer(
             uid: data['uid'] ?? "",
             phone_no: data['phone_no'] ?? "",
@@ -128,9 +137,26 @@ class DatabaseService {
     return isSuccess;
   }
 
-  Future uploadFileToFirebase( String root, String referName, XFile? imageFile) async {
+  Future updateClaimData(String claim_id, var claim_data) async {
+    bool isSuccess = false;
+    await claim_collection
+        .doc(claim_id)
+        .set(claim_data, SetOptions(merge: true))
+        .then((value) {
+      print("Claim Updated");
+      isSuccess = true;
+    })
+        // ignore: invalid_return_type_for_catch_error
+        .catchError((error) => print("Failed to updaet claim: $error"));
+    return isSuccess;
+  }
+
+  Future uploadFileToFirebase(
+      String root, String referName, XFile? imageFile) async {
     String downloadURL = "";
-    String fileName = referName + DateTime.now().millisecondsSinceEpoch.toString() + extension(imageFile!.path);
+    String fileName = referName +
+        DateTime.now().millisecondsSinceEpoch.toString() +
+        extension(imageFile!.path);
     String refer = '$root/$uid/$fileName';
     try {
       await firebase_storage.FirebaseStorage.instance
@@ -155,7 +181,8 @@ class DatabaseService {
         .map(_claimDataFromSnapshot);
   }
 
-  Stream<List<Claim?>> officerClaimList(String? select_claim_state, String? select_agrarian_division) {
+  Stream<List<Claim?>> officerClaimList(
+      String? select_claim_state, String? select_agrarian_division) {
     print("select claim_state - " + select_claim_state!);
     print("select agrarian_division - " + select_agrarian_division!);
     return claim_collection

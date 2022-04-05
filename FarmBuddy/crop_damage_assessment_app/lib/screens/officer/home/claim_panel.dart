@@ -7,9 +7,10 @@ import 'package:crop_damage_assessment_app/models/user.dart';
 import 'package:crop_damage_assessment_app/services/auth.dart';
 
 class ClaimPanel extends StatefulWidget {
-  const ClaimPanel({Key? key, required this.claim}) : super(key: key);
+  const ClaimPanel({Key? key, required this.uid , required this.claim}) : super(key: key);
 
   final Claim? claim;
+  final String? uid;
 
   @override
   _ClaimPanelState createState() => _ClaimPanelState();
@@ -56,7 +57,7 @@ class _ClaimPanelState extends State<ClaimPanel> {
         },
         body: TabBarView(
           children: <Widget>[
-            ClaimView(claim: widget.claim),
+            ClaimView(uid: widget.uid,  claim: widget.claim),
             ClaimProfile(uid: widget.claim!.uid, claim_uid: widget.claim!.uid)
           ],
         ),
