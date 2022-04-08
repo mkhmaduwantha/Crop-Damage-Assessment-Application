@@ -34,7 +34,7 @@ class _ClaimPanelState extends State<ClaimPanel> {
                 IconButton(
                     icon: const Icon(Icons.power_settings_new),
                     onPressed: () async {
-                      await _auth.signout();
+                      await _auth.signoutUser(widget.key, context);
                     })
               ],
               pinned: true,

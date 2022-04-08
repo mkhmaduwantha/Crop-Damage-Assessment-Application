@@ -29,13 +29,13 @@ class _ClaimPanelState extends State<ClaimPanel> {
           return <Widget>[
             SliverAppBar(
               title: const Text('View Claim'),
-              backgroundColor: const Color.fromARGB(255, 105, 184, 109),
+              backgroundColor: const Color.fromARGB(255, 201, 195, 117),
               elevation: 0.0,
               actions: <Widget>[
                 IconButton(
                     icon: const Icon(Icons.power_settings_new),
                     onPressed: () async {
-                      await _auth.signout();
+                      await _auth.signoutUser(widget.key, context);
                     })
               ],
               pinned: true,
@@ -45,7 +45,7 @@ class _ClaimPanelState extends State<ClaimPanel> {
                 indicatorPadding: const EdgeInsets.all(10),
                 indicator: BoxDecoration(
                   borderRadius: BorderRadius.circular(3),
-                  color: const Color.fromARGB(255, 74, 236, 128),
+                  color: const Color.fromARGB(255, 143, 142, 61),
                 ),
                 tabs: const [
                   Tab(child: Text('Claim')),

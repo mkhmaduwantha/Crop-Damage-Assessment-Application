@@ -91,7 +91,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                     children: [
                       const DrawerHeader(
                         decoration: BoxDecoration(
-                          color: Color.fromARGB(255, 105, 184, 109),
+                          color: Color.fromARGB(255, 115, 162, 177),
                         ),
                         child: Text('Farm Buddy'),
                       ),

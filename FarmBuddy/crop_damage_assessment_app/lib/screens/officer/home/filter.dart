@@ -57,7 +57,7 @@ class _FilterState extends State<Filter> {
             resizeToAvoidBottomInset: false,
             appBar: AppBar(
               title: const Text('Update your view claim settings'),
-              backgroundColor: const Color.fromARGB(255, 105, 184, 109),
+              backgroundColor: const Color.fromARGB(255, 201, 195, 117),
               elevation: 0.0
             ),
             body: SingleChildScrollView(

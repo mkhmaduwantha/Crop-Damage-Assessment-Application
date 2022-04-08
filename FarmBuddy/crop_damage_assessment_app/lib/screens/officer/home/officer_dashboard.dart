@@ -6,6 +6,7 @@ import 'package:crop_damage_assessment_app/services/auth.dart';
 import 'package:crop_damage_assessment_app/services/database.dart';
 import 'package:crop_damage_assessment_app/components/loading.dart';
 import 'package:crop_damage_assessment_app/screens/officer/home/filter.dart';
+import 'package:crop_damage_assessment_app/screens/officer/home/edit_officer.dart';
 import 'package:crop_damage_assessment_app/screens/officer/home/view_claim_list.dart';
 
 class OfficerDashboard extends StatefulWidget {
@@ -71,7 +72,7 @@ class _OfficerDashboardState extends State<OfficerDashboard> {
                       SliverAppBar(
                           title: const Text('Farm Buddy - Officer'),
                           backgroundColor:
-                              const Color.fromARGB(255, 105, 184, 109),
+                              const Color.fromARGB(255, 201, 195, 117),
                           elevation: 0.0,
                           actions: <Widget>[
                             // IconButton(
@@ -82,7 +83,8 @@ class _OfficerDashboardState extends State<OfficerDashboard> {
                                 icon: const Icon(Icons.power_settings_new),
                                 onPressed: () async {
                                   await _auth.signoutUser(widget.key, context);
-                                }),
+                                }
+                            ),
                           ],
                           pinned: true,
                           floating: true),
@@ -95,7 +97,7 @@ class _OfficerDashboardState extends State<OfficerDashboard> {
                   children: [
                     const DrawerHeader(
                       decoration: BoxDecoration(
-                        color: Color.fromARGB(255, 105, 184, 109),
+                        color: Color.fromARGB(255, 201, 195, 117),
                       ),
                       child: Text('Farm Buddy'),
                     ),
@@ -115,6 +117,18 @@ class _OfficerDashboardState extends State<OfficerDashboard> {
                         }
                       },
                     ),
+
+                    ListTile(
+                        title: const Text('Edit Profile'),
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    OfficerEditData(uid: widget.uid)),
+                          );
+                        },
+                      ),
                     ListTile(
                       title: const Text('Logout'),
                       onTap: () async {

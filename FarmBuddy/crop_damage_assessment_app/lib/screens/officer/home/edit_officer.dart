@@ -2,46 +2,43 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:cool_alert/cool_alert.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:crop_damage_assessment_app/models/farmer.dart';
 import 'package:crop_damage_assessment_app/services/auth.dart';
-import 'package:crop_damage_assessment_app/screens/wrapper.dart';
 import 'package:crop_damage_assessment_app/services/database.dart';
 import 'package:crop_damage_assessment_app/components/loading.dart';
 import 'package:crop_damage_assessment_app/components/decoration.dart';
-import 'package:crop_damage_assessment_app/screens/officer/add_officer.dart';
+import 'package:crop_damage_assessment_app/screens/officer/home/officer_dashboard.dart';
 
-class FarmerAddData extends StatefulWidget {
-  const FarmerAddData({Key? key, required this.uid, required this.phone_no})
-      : super(key: key);
+Farmer? user;
+
+class OfficerEditData extends StatefulWidget {
+  const OfficerEditData({Key? key, required this.uid}) : super(key: key);
 
   final String? uid;
-  final String? phone_no;
 
   @override
-  _FarmerAddDataState createState() => _FarmerAddDataState();
+  _OfficerEditDataState createState() => _OfficerEditDataState();
 }
 
-class _FarmerAddDataState extends State<FarmerAddData> {
+class _OfficerEditDataState extends State<OfficerEditData> {
   final AuthService _auth = AuthService();
 
   final _formKey = GlobalKey<FormState>();
   String error = "";
-  bool loading = false;
+  bool loading = true;
 
   // text field state
   String name = "";
-  String type = "farmer";
+  String phone_no = "";
+  String type = "officer";
   String email = "";
 
   String agrarian_division = "";
+  String province = "";
   String nic = "";
   String address = "";
-  String province = "";
 
-  String bank = "";
-  String account_name = "";
-  String account_no = "";
-  String branch = "";
-
+  String profile_network_image = "";
   XFile? profile_image;
 
   static const List<String> _agrarianDivisionOptions = <String>[
@@ -58,27 +55,63 @@ class _FarmerAddDataState extends State<FarmerAddData> {
   ];
 
   final picker = ImagePicker();
+
   Future pickImage() async {
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
 
     setState(() {
-      // profile_image = File(pickedFile!.path);
       profile_image = pickedFile;
     });
   }
 
-  void triggerErrorAlert(BuildContext context) {
+
+  void getUserProfileData() async {
+    final select_user = await DatabaseService(uid: widget.uid).getUserData(widget.uid);
+    setState(() {
+      user = select_user;
+      name = select_user!.name;
+      email = select_user.email;
+      phone_no = select_user.phone_no;
+      agrarian_division = select_user.agrarian_division;
+      nic = select_user.nic;
+      address = select_user.address;
+      province = select_user.province;
+      profile_network_image = select_user.profile_url;
+
+      loading = false;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getUserProfileData();
+  }
+
+  void triggerSuccessAlert() {
+    CoolAlert.show(
+        context: context,
+        type: CoolAlertType.success,
+        text: 'Updated successfully!',
+        autoCloseDuration: const Duration(seconds: 10),
+        onConfirmBtnTap: () => closeAlert());
+  }
+
+  void triggerErrorAlert() {
     CoolAlert.show(
         context: context,
         type: CoolAlertType.error,
         title: 'Oops...',
         text: 'Sorry, something went wrong',
         loopAnimation: false,
-        onCancelBtnTap: () => closeAlert(context));
+        onCancelBtnTap: () => closeAlert());
   }
 
-  void closeAlert(BuildContext context) async {
-    await _auth.signoutUser(widget.key, context);
+  void closeAlert() {
+    Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+            builder: (context) => OfficerDashboard(uid: widget.uid)));
   }
 
   @override
@@ -89,56 +122,33 @@ class _FarmerAddDataState extends State<FarmerAddData> {
             backgroundColor: const Color.fromARGB(255, 242, 255, 243),
             resizeToAvoidBottomInset: false,
             appBar: AppBar(
-              title: const Text('Farmer - Registraion'),
-              backgroundColor: const Color.fromARGB(255, 105, 184, 109),
+              title: const Text('Edit Profile'),
+              backgroundColor: const Color.fromARGB(255, 201, 195, 117),
               elevation: 0.0,
               actions: <Widget>[
-
                 TextButton.icon(
                     icon: const Icon(Icons.person),
-                    label: const Text('Officer'),
+                    label: const Text('logout'),
                     style: TextButton.styleFrom(
                       primary: Colors.white, // foreground
                     ),
                     onPressed: () async {
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute( builder: (context) => OfficerAddData(uid: widget.uid, phone_no: widget.phone_no))
-                        );
-                    }
-                ),
-
-                IconButton(
-                  icon: const Icon(Icons.power_settings_new),
-                  onPressed: () async {
-                    await _auth.signoutUser(widget.key, context);
-                  }
-                )
+                      await _auth.signoutUser(widget.key, context);
+                    })
               ],
             ),
             body: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(
-                    vertical: 20.0, horizontal: 50.0),
+                padding: const EdgeInsets.symmetric( vertical: 20.0, horizontal: 50.0),
                 child: Form(
                   key: _formKey,
                   child: Column(
                     children: <Widget>[
-                      const Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          'Peronal Details',
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 20.0,
-                              color: Color.fromARGB(255, 32, 196, 100)),
-                        ),
-                      ),
+
                       const SizedBox(height: 20.0),
                       TextFormField(
                         keyboardType: TextInputType.name,
-                        decoration:
-                            textInputDecoration.copyWith(hintText: 'Name'),
+                        decoration: textInputDecoration.copyWith(hintText: 'Name'),
+                        initialValue: name,
                         validator: (val) =>
                             val!.isEmpty ? 'Enter your name' : null,
                         onChanged: (val) {
@@ -151,6 +161,7 @@ class _FarmerAddDataState extends State<FarmerAddData> {
                         keyboardType: TextInputType.emailAddress,
                         decoration:
                             textInputDecoration.copyWith(hintText: 'Email'),
+                        initialValue: email,
                         validator: (val) =>
                             val!.isEmpty ? 'Enter your email' : null,
                         onChanged: (val) {
@@ -159,31 +170,37 @@ class _FarmerAddDataState extends State<FarmerAddData> {
                         },
                       ),
                       const SizedBox(height: 20.0),
+                      TextFormField(
+                        keyboardType: TextInputType.phone,
+                        readOnly: true,
+                        style: const TextStyle(fontSize: 18, color: Color.fromARGB(255, 147, 148, 148)),
+                        decoration: textInputDecoration.copyWith(
+                            hintText: 'Phone Number'),
+                        initialValue: phone_no,
+                        validator: (val) =>
+                            val!.isEmpty ? 'Enter a Phone Number' : null,
+                        onChanged: (val) {
+                          setState(() => phone_no = val);
+                          setState(() => error = "");
+                        },
+                      ),
+                      const SizedBox(height: 20.0),
                       Autocomplete<String>(
-                          optionsBuilder: (TextEditingValue textEditingValue) {
-                        // return _agrarianDivisionOptions
-                        //   .where((String continent) => continent.toLowerCase()
-                        //     .startsWith(textEditingValue.text.toLowerCase())
-                        //   )
-                        //   .toList();
-
-                        if (textEditingValue.text == '') {
-                          return const Iterable<String>.empty();
-                        }
-                        return _agrarianDivisionOptions.where((String option) {
-                          return option
-                              .contains(textEditingValue.text.toLowerCase());
-                        });
-                      }, fieldViewBuilder: (BuildContext context,
-                              TextEditingController fieldTextEditingController,
-                              FocusNode fieldFocusNode,
-                              VoidCallback onFieldSubmitted) {
+                        optionsBuilder: (TextEditingValue textEditingValue) {
+                          if (textEditingValue.text == '') {
+                            return const Iterable<String>.empty();
+                          }
+                          return _agrarianDivisionOptions.where((String option) {
+                            return option.contains(textEditingValue.text.toLowerCase());
+                          });
+                        }, 
+                      initialValue: TextEditingValue(text: agrarian_division),
+                      fieldViewBuilder: (BuildContext context,  TextEditingController fieldTextEditingController, FocusNode fieldFocusNode, VoidCallback onFieldSubmitted) {
                         return TextFormField(
                           controller: fieldTextEditingController,
                           focusNode: fieldFocusNode,
                           keyboardType: TextInputType.text,
-                          decoration: textInputDecoration.copyWith(
-                              hintText: 'Agrarian Division'),
+                          decoration: textInputDecoration.copyWith( hintText: 'Agrarian Division'),
                           validator: (val) => agrarian_division.isEmpty
                               ? 'Select your agrarian division'
                               : null,
@@ -197,39 +214,10 @@ class _FarmerAddDataState extends State<FarmerAddData> {
                         setState(() => error = "");
                         // debugPrint('You just selected $selection');
                       }),
-                      const SizedBox(height: 20.0),
-                      TextFormField(
-                        keyboardType: TextInputType.text,
-                        decoration:
-                            textInputDecoration.copyWith(hintText: 'NIC'),
-                        validator: (val) =>
-                            val!.isEmpty ? 'Enter your nic' : null,
-                        onChanged: (val) {
-                          setState(() => nic = val);
-                          setState(() => error = "");
-                        },
-                      ),
-                      const SizedBox(height: 20.0),
-                      TextFormField(
-                        keyboardType: TextInputType.streetAddress,
-                        decoration:
-                            textInputDecoration.copyWith(hintText: 'Address'),
-                        validator: (val) =>
-                            val!.isEmpty ? 'Enter your address' : null,
-                        onChanged: (val) {
-                          setState(() => address = val);
-                          setState(() => error = "");
-                        },
-                      ),
+
                       const SizedBox(height: 20.0),
                       Autocomplete<String>(
                           optionsBuilder: (TextEditingValue textEditingValue) {
-                        // return _provinceOptions
-                        //   .where((String continent) => continent.toLowerCase()
-                        //     .startsWith(textEditingValue.text.toLowerCase())
-                        //   )
-                        //   .toList();
-
                         if (textEditingValue.text == '') {
                           return const Iterable<String>.empty();
                         }
@@ -237,7 +225,9 @@ class _FarmerAddDataState extends State<FarmerAddData> {
                           return option
                               .contains(textEditingValue.text.toLowerCase());
                         });
-                      }, fieldViewBuilder: (BuildContext context,
+                      }, 
+                      initialValue: TextEditingValue(text: province),
+                      fieldViewBuilder: (BuildContext context,
                               TextEditingController fieldTextEditingController,
                               FocusNode fieldFocusNode,
                               VoidCallback onFieldSubmitted) {
@@ -259,67 +249,30 @@ class _FarmerAddDataState extends State<FarmerAddData> {
                         setState(() => error = "");
                         // debugPrint('You just selected $selection');
                       }),
-                      const SizedBox(height: 40.0),
-                      const Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          'Bank Details',
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 20.0,
-                              color: Color.fromARGB(255, 32, 196, 100)),
-                        ),
-                      ),
+
                       const SizedBox(height: 20.0),
                       TextFormField(
                         keyboardType: TextInputType.text,
-                        decoration:
-                            textInputDecoration.copyWith(hintText: 'Bank Name'),
-                        validator: (val) =>
-                            val!.isEmpty ? 'Enter your bank name' : null,
+                        decoration: textInputDecoration.copyWith(hintText: 'NIC'),
+                        validator: (val) => val!.isEmpty ? 'Enter your nic' : null,
+                        initialValue: nic,
                         onChanged: (val) {
-                          setState(() => account_name = val);
+                          setState(() => nic = val);
                           setState(() => error = "");
                         },
                       ),
                       const SizedBox(height: 20.0),
                       TextFormField(
-                        keyboardType: TextInputType.text,
-                        decoration: textInputDecoration.copyWith(
-                            hintText: 'Name in Bank Account'),
-                        validator: (val) => val!.isEmpty
-                            ? 'Enter your name in bank account'
-                            : null,
+                        keyboardType: TextInputType.streetAddress,
+                        decoration: textInputDecoration.copyWith(hintText: 'Address'),
+                        initialValue: address,
+                        validator: (val) => val!.isEmpty ? 'Enter your address' : null,
                         onChanged: (val) {
-                          setState(() => bank = val);
+                          setState(() => address = val);
                           setState(() => error = "");
                         },
                       ),
-                      const SizedBox(height: 20.0),
-                      TextFormField(
-                        keyboardType: TextInputType.text,
-                        decoration: textInputDecoration.copyWith(
-                            hintText: 'Account No'),
-                        validator: (val) =>
-                            val!.isEmpty ? 'Enter your account no' : null,
-                        onChanged: (val) {
-                          setState(() => account_no = val);
-                          setState(() => error = "");
-                        },
-                      ),
-                      const SizedBox(height: 20.0),
-                      TextFormField(
-                        keyboardType: TextInputType.text,
-                        decoration: textInputDecoration.copyWith(
-                            hintText: 'Branch Name'),
-                        validator: (val) =>
-                            val!.isEmpty ? 'Enter your branch name' : null,
-                        onChanged: (val) {
-                          setState(() => branch = val);
-                          setState(() => error = "");
-                        },
-                      ),
+
                       const SizedBox(height: 40.0),
                       const Align(
                         alignment: Alignment.centerLeft,
@@ -332,43 +285,45 @@ class _FarmerAddDataState extends State<FarmerAddData> {
                               color: Color.fromARGB(255, 32, 196, 100)),
                         ),
                       ),
+
                       const SizedBox(height: 20.0),
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(30.0),
-                        // ignore: unnecessary_null_comparison
-                        child: profile_image != null
-                            ? Image.file(File(profile_image!.path))
-                            : TextButton(
+                      TextButton(
                                 child: const Icon(
                                   Icons.add_a_photo,
                                   size: 50,
                                 ),
                                 onPressed: pickImage,
                               ),
+
+                      const SizedBox(height: 10.0),
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(30.0),
+                        // ignore: unnecessary_null_comparison
+                        child: profile_image != null
+                            ? Image.file(File(profile_image!.path))
+                            : Image(image: NetworkImage(profile_network_image))
                       ),
                       const SizedBox(height: 20.0),
                       ElevatedButton(
-                          child: const Text('Submit'),
+                          child: const Text('Update'),
                           style: ElevatedButton.styleFrom(
                             primary: const Color.fromARGB(
                                 255, 71, 143, 75), // background
                             onPrimary: Colors.white, // foreground
                           ),
                           onPressed: () async {
-                            // print("agrarian_division {$agrarian_division}");
-                            
-
-                            if (_formKey.currentState != null && _formKey.currentState!.validate()) {
+                            if (_formKey.currentState != null &&
+                                _formKey.currentState!.validate()) {
                               setState(() {
                                 loading = true;
                               });
-                              DatabaseService db = DatabaseService(uid: widget.uid);
+
                               String profile_url = "";
+                              DatabaseService db = DatabaseService(uid: widget.uid);
 
                               if (profile_image == null) {
-                                profile_url = "https://firebasestorage.googleapis.com/v0/b/farm-buddy-app.appspot.com/o/assets%2Fuser.png?alt=media&token=b965e689-f777-4d32-9702-bc8f8ec19355";
+                                profile_url = profile_network_image;
                               } else {
-                                print(profile_image == null);
                                 profile_url = await db.uploadFileToFirebase( "profile", "profile_", profile_image);
                               }
 
@@ -377,28 +332,24 @@ class _FarmerAddDataState extends State<FarmerAddData> {
                                 "name": name,
                                 "email": email,
                                 "type": type,
-                                "phone_no": widget.phone_no,
+                                "phone_no": phone_no,
                                 "agrarian_division": agrarian_division,
                                 "nic": nic,
                                 "address": address,
                                 "province": province,
-                                "bank": bank,
-                                "account_name": account_name,
-                                "account_no": account_no,
-                                "branch": branch,
                                 "profile_url": profile_url
                               };
 
                               bool isSuccess = await db.updateUserData(user_data);
+                              
                               setState(() {
                                 loading = false;
                               });
 
                               if (isSuccess) {
-                                Navigator.pushReplacement(context,
-                                  MaterialPageRoute(builder: (context) => Wrapper(key: widget.key)));
+                                triggerSuccessAlert();
                               } else {
-                                triggerErrorAlert(context);
+                                triggerErrorAlert();
                               }
                             }
                           }),

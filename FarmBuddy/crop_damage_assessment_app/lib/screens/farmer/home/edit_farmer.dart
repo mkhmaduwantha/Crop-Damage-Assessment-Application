@@ -69,10 +69,6 @@ class _FarmerEditDataState extends State<FarmerEditData> {
     });
   }
 
-  // TextEditingValue getUserProfileData() async {
-    
-  // }
-
 
   void getUserProfileData() async {
     final select_user = await DatabaseService(uid: widget.uid).getUserData(widget.uid);

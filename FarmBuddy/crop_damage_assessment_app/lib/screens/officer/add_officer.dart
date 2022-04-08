@@ -28,7 +28,6 @@ class _OfficerAddDataState extends State<OfficerAddData> {
 
   // text field state
   String name = "";
-  String password = "";
   String type = "officer_pending";
   String email = "";
   String agrarian_division = "";
@@ -83,15 +82,11 @@ class _OfficerAddDataState extends State<OfficerAddData> {
             backgroundColor: const Color.fromARGB(255, 242, 255, 243),
             resizeToAvoidBottomInset: false,
             appBar: AppBar(
-              title: const Text('Add Data'),
+              title: const Text('Officer - Registraion'),
               backgroundColor: const Color.fromARGB(255, 105, 184, 109),
               elevation: 0.0,
               actions: <Widget>[
-                IconButton(
-                    icon: const Icon(Icons.power_settings_new),
-                    onPressed: () async {
-                      await _auth.signoutUser(widget.key, context);
-                    }),
+
                 TextButton.icon(
                     icon: const Icon(Icons.person),
                     label: const Text('Farmer'),
@@ -104,7 +99,15 @@ class _OfficerAddDataState extends State<OfficerAddData> {
                           MaterialPageRoute( builder: (context) => FarmerAddData(uid: widget.uid, phone_no: widget.phone_no))
                         );
                     }
-                )
+                ),
+
+                IconButton(
+                  icon: const Icon(Icons.power_settings_new),
+                  onPressed: () async {
+                    await _auth.signoutUser(widget.key, context);
+                  }
+                ),
+
               ],
             ),
             body: SingleChildScrollView(
