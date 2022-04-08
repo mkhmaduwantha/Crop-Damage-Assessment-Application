@@ -36,7 +36,6 @@ class _FarmerDashboardState extends State<FarmerDashboard> {
     setState(() {
       loading = false;
     });
-    print("3");
   }
 
   @override

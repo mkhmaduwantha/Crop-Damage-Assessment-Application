@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:crop_damage_assessment_app/screens/authenticate/sign_in.dart';
-import 'package:crop_damage_assessment_app/screens/authenticate/farmer/sign_up.dart';
+import 'package:crop_damage_assessment_app/screens/authenticate/sign_up.dart';
 
 class Authenticate extends StatefulWidget {
   const Authenticate({ Key? key }) : super(key: key);

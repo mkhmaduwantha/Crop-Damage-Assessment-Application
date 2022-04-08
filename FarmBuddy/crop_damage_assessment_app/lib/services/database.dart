@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:crop_damage_assessment_app/models/farmer.dart';
+import 'package:crop_damage_assessment_app/models/officer.dart';
 import 'package:path/path.dart';
 import 'package:latlng/latlng.dart';
 import 'package:image_picker/image_picker.dart';
@@ -27,6 +28,10 @@ class DatabaseService {
 
   String getString(QueryDocumentSnapshot doc, String field) {
     return doc.data().toString().contains(field) ? doc.get(field) : "";
+  }
+
+  String getProfileUrl(QueryDocumentSnapshot doc, String field) {
+    return doc.data().toString().contains(field) ? doc.get(field) : "https://firebasestorage.googleapis.com/v0/b/farm-buddy-app.appspot.com/o/assets%2Fuser.png?alt=media&token=b965e689-f777-4d32-9702-bc8f8ec19355";
   }
 
   int getInt(QueryDocumentSnapshot doc, String field) {
@@ -74,6 +79,24 @@ class DatabaseService {
     }).toList();
   }
 
+  // officer data from snapshots
+  List<Officer?> _officerDataFromSnapshot(QuerySnapshot snapshot) {
+    return snapshot.docs.map((doc) {
+      return Officer(
+        uid: getString(doc, "uid"),
+        phone_no: getString(doc, "phone_no"),
+        name: getString(doc, "name"),
+        email: getString(doc, "email"),
+        type: getString(doc, "type"),
+        agrarian_division: getString(doc, "agrarian_division"),
+        province: getString(doc, "province"),
+        nic: getString(doc, "nic"),
+        address: getString(doc, "address"),
+        profile_url: getProfileUrl(doc, "profile_url")
+      );
+    }).toList();
+  }
+
   // get user doc stream
   Stream<UserData> get userData {
     print("search user");
@@ -91,6 +114,20 @@ class DatabaseService {
     })
         // ignore: invalid_return_type_for_catch_error
         .catchError((error) => print("Failed to add user: $error"));
+    return isSuccess;
+  }
+
+  Future updateOfficerData(String officer_uid, var user_data) async {
+    bool isSuccess = false;
+    await user_collection
+        .doc(officer_uid)
+        .set(user_data, SetOptions(merge: true))
+        .then((value) {
+      print("Officer Updated");
+      isSuccess = true;
+    })
+        // ignore: invalid_return_type_for_catch_error
+        .catchError((error) => print("Failed to update officer: $error"));
     return isSuccess;
   }
 
@@ -172,8 +209,7 @@ class DatabaseService {
   }
 
   Stream<List<Claim?>> farmerClaimList(String? select_claim_state) {
-    print("select_uidt - " + select_uid!);
-    print("select_claim_state - " + select_claim_state!);
+
     return claim_collection
         .orderBy('timestamp', descending: true)
         .where('uid', isEqualTo: select_uid)
@@ -190,5 +226,15 @@ class DatabaseService {
         .where('agrarian_division', isEqualTo: select_agrarian_division)
         .snapshots()
         .map(_claimDataFromSnapshot);
+  }
+
+
+    Stream<List<Officer?>> get officerList{
+
+    return user_collection
+        .where('type', isGreaterThanOrEqualTo: "officer")
+        // .where('type',arrayContainsAny: ['officer', 'officer_pending'])
+        .snapshots()
+        .map(_officerDataFromSnapshot);
   }
 }

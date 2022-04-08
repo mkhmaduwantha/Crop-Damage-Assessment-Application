@@ -1,10 +1,13 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:cool_alert/cool_alert.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:crop_damage_assessment_app/services/auth.dart';
+import 'package:crop_damage_assessment_app/screens/wrapper.dart';
 import 'package:crop_damage_assessment_app/services/database.dart';
 import 'package:crop_damage_assessment_app/components/loading.dart';
 import 'package:crop_damage_assessment_app/components/decoration.dart';
+import 'package:crop_damage_assessment_app/screens/officer/add_officer.dart';
 
 class FarmerAddData extends StatefulWidget {
   const FarmerAddData({Key? key, required this.uid, required this.phone_no})
@@ -64,6 +67,20 @@ class _FarmerAddDataState extends State<FarmerAddData> {
     });
   }
 
+  void triggerErrorAlert(BuildContext context) {
+    CoolAlert.show(
+        context: context,
+        type: CoolAlertType.error,
+        title: 'Oops...',
+        text: 'Sorry, something went wrong',
+        loopAnimation: false,
+        onCancelBtnTap: () => closeAlert(context));
+  }
+
+  void closeAlert(BuildContext context) async {
+    await _auth.signoutUser(widget.key, context);
+  }
+
   @override
   Widget build(BuildContext context) {
     return loading
@@ -84,7 +101,21 @@ class _FarmerAddDataState extends State<FarmerAddData> {
                     ),
                     onPressed: () async {
                       await _auth.signout();
-                    })
+                    }
+                ),
+                TextButton.icon(
+                    icon: const Icon(Icons.person),
+                    label: const Text('Officer'),
+                    style: TextButton.styleFrom(
+                      primary: Colors.white, // foreground
+                    ),
+                    onPressed: () async {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute( builder: (context) => OfficerAddData(uid: widget.uid, phone_no: widget.phone_no))
+                        );
+                    }
+                )
               ],
             ),
             body: SingleChildScrollView(
@@ -327,16 +358,21 @@ class _FarmerAddDataState extends State<FarmerAddData> {
                           ),
                           onPressed: () async {
                             // print("agrarian_division {$agrarian_division}");
-                            // print(agrarian_division.isEmpty);
+                            
 
-                            if (_formKey.currentState != null &&
-                                _formKey.currentState!.validate()) {
+                            if (_formKey.currentState != null && _formKey.currentState!.validate()) {
                               setState(() {
                                 loading = true;
                               });
                               DatabaseService db = DatabaseService(uid: widget.uid);
-                              String profile_url =
-                                  await db.uploadFileToFirebase( "profile", "profile_", profile_image);
+                              String profile_url = "";
+
+                              if (profile_image == null) {
+                                profile_url = "https://firebasestorage.googleapis.com/v0/b/farm-buddy-app.appspot.com/o/assets%2Fuser.png?alt=media&token=b965e689-f777-4d32-9702-bc8f8ec19355";
+                              } else {
+                                print(profile_image == null);
+                                profile_url = await db.uploadFileToFirebase( "profile", "profile_", profile_image);
+                              }
 
                               var user_data = {
                                 "uid": widget.uid,
@@ -355,7 +391,17 @@ class _FarmerAddDataState extends State<FarmerAddData> {
                                 "profile_url": profile_url
                               };
 
-                              await db.updateUserData(user_data);
+                              bool isSuccess = await db.updateUserData(user_data);
+                              setState(() {
+                                loading = false;
+                              });
+
+                              if (isSuccess) {
+                                Navigator.pushReplacement(context,
+                                  MaterialPageRoute(builder: (context) => Wrapper(key: widget.key)));
+                              } else {
+                                triggerErrorAlert(context);
+                              }
                             }
                           }),
                       const SizedBox(height: 12.0),

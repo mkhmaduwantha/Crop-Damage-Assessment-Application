@@ -26,11 +26,28 @@ class _ViewClaimListState extends State<ViewClaimList> {
         ? const Loading()
         : Container(
             padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 30.0),
-            child: ListView.builder(
-              itemCount: claims.length,
-              itemBuilder: (context, index) {
-                return ClaimTile(claim: claims[index]);
-              },
-            ));
+            child: claims.isNotEmpty ? 
+            
+              ListView.builder(
+                itemCount: claims.length,
+                itemBuilder: (context, index) {
+                  return ClaimTile(claim: claims[index]);
+                },
+              )
+
+              :
+
+              const Align(
+                alignment: Alignment.topCenter,
+                child:Text(
+                    "Empty",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                        fontSize: 18.0,
+                        color: Color.fromARGB(255, 80, 79, 79)),
+                  )  
+              )
+
+            );
   }
 }

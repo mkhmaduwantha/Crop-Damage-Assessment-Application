@@ -1,3 +1,5 @@
+import 'package:crop_damage_assessment_app/screens/authenticate/register.dart';
+import 'package:crop_damage_assessment_app/screens/officer/officer_pending.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:crop_damage_assessment_app/models/user.dart';
@@ -5,6 +7,7 @@ import 'package:crop_damage_assessment_app/models/user_auth.dart';
 import 'package:crop_damage_assessment_app/services/database.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:crop_damage_assessment_app/screens/farmer/add_farmer.dart';
+import 'package:crop_damage_assessment_app/screens/officer/add_officer.dart';
 import 'package:crop_damage_assessment_app/screens/admin/admin_dashboard.dart';
 import 'package:crop_damage_assessment_app/screens/farmer/home/farmer_dashboard.dart';
 import 'package:crop_damage_assessment_app/screens/officer/home/officer_dashboard.dart';
@@ -46,18 +49,21 @@ class _HomeState extends State<Home> {
             switch (user?.type) {
               case 'farmer':
                 return FarmerDashboard(uid: user_auth?.uid);
+
               case 'officer':
                 return OfficerDashboard(uid: user_auth?.uid);
 
+              case 'officer_pending':
+                return OfficerPending(uid: user_auth?.uid, phone_no: user_auth?.phone_no);
+
               case 'admin':
-                return AdminDashboard(key: widget.key);
+                return AdminDashboard(uid: user_auth?.uid);
 
               default:
-                return FarmerAddData(uid: user_auth?.uid, phone_no: user_auth?.phone_no);
+                return Register(uid: user_auth?.uid, phone_no: user_auth?.phone_no);
             }
           } else {
-            return FarmerAddData(
-                uid: user_auth?.uid, phone_no: user_auth?.phone_no);
+            return Register(uid: user_auth?.uid, phone_no: user_auth?.phone_no);
           }
         });
   }

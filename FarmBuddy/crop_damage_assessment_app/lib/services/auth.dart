@@ -40,10 +40,36 @@ class AuthService {
       UserCredential result = await _auth.createUserWithEmailAndPassword(
           email: email, password: password);
       User? user = result.user;
-      return _userFromFirebaseUser(user);
+      return user;
+      // return _userFromFirebaseUser(user);
     } catch (error) {
       print(error.toString());
       return null;
+    }
+  }
+
+  //register with email & password
+  Future sendAuthenticationLink(String email) async {
+    var acs = ActionCodeSettings(
+        // URL you want to redirect back to. The domain (www.example.com) for this
+        // URL must be whitelisted in the Firebase Console.
+        url: 'https://www.example.com/finishSignUp?cartId=1234',
+        // This must be true
+        handleCodeInApp: true,
+        iOSBundleId: 'com.example.ios',
+        androidPackageName: 'com.example.android',
+        // installIfNotAvailable
+        androidInstallApp: true,
+        // minimumVersion
+        androidMinimumVersion: '12');
+
+    try {
+      await _auth.sendSignInLinkToEmail(email: email, actionCodeSettings: acs);
+      print('Successfully sent email verification');
+      return true;
+    } catch (error) {
+      print('Error sending email verification: $error');
+      return false;
     }
   }
 
@@ -79,17 +105,12 @@ class AuthService {
 
       if (_auth.currentUser == null) {
         print('User is currently signed out!');
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) => Wrapper(key: key)
-          )
-        );
+        Navigator.pushReplacement(context,
+            MaterialPageRoute(builder: (context) => Wrapper(key: key)));
       } else {
         print('User is signed in!');
         return;
       }
-
 
       // _auth.authStateChanges().listen((User? user) {
       //   if (user == null) {

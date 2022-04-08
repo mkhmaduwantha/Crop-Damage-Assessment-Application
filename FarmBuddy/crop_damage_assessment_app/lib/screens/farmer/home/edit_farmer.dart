@@ -146,7 +146,7 @@ class _FarmerEditDataState extends State<FarmerEditData> {
                       primary: Colors.white, // foreground
                     ),
                     onPressed: () async {
-                      await _auth.signout();
+                      await _auth.signoutUser(widget.key, context);
                     })
               ],
             ),
