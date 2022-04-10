@@ -7,9 +7,10 @@ import 'package:crop_damage_assessment_app/components/loading.dart';
 import 'package:crop_damage_assessment_app/screens/farmer/home/claim_tile.dart';
 
 class ViewNotificationList extends StatefulWidget {
-  const ViewNotificationList({Key? key, required this.uid, required this.notification_list}) : super(key: key);
+  const ViewNotificationList({Key? key, required this.uid, required this.notifications_all_list, required this.notification_list}) : super(key: key);
 
   final String? uid;
+  final List<dynamic> notifications_all_list;
   final List<NotificationModel> notification_list;
 
   @override
@@ -41,7 +42,7 @@ class _ViewNotificationListState extends State<ViewNotificationList> {
                   ListView.builder(
                     itemCount: widget.notification_list.length,
                     itemBuilder: (context, index) {
-                      return NotificationTile(notification: widget.notification_list[index]);
+                      return NotificationTile(uid: widget.uid, index: index, notifications_all_list: widget.notifications_all_list, notification: widget.notification_list[index]);
                     },
                   )
                 : 

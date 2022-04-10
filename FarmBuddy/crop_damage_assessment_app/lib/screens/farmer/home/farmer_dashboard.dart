@@ -86,34 +86,37 @@ class _FarmerDashboardState extends State<FarmerDashboard> {
 
   _createList() async {
     await Future.forEach(_notifications, (dynamic element) async {
+      var notification_id = element['notificationid'];
       var claimState = element['claimState'];
+      var to = element['to'];
       var datetime = DateFormat.jm()
           .add_yMd()
           .format(DateTime.parse(element['date'].toDate().toString()));
+      // var datetime = element['date'];
       var message = element['message'];
 
       var from = "";
 
 
-      var model = NotificationModel( status: claimState, from: from, datetime: datetime, message: message);
+      var model = NotificationModel( notification_id: notification_id, to:to, status: claimState, from: from, datetime: datetime, message: message);
       notification_list.add(model);
     });
 
     setState(() {});
   }
 
-  _updateNotification(int index) async {
-    dynamic notifi = _notifications[index];
-    final notification = fnotification.Notification(notifi['notificationid'],
-        from: notifi['from'],
-        to: notifi['to'],
-        message: notifi['message'],
-        status: "read",
-        claimState: notifi['claimState'],
-        date: DateTime.parse(notifi['date'].toDate().toString()));
+  // _updateNotification(int index) async {
+  //   dynamic notifi = _notifications[index];
+  //   final notification = fnotification.Notification(notifi['notificationid'],
+  //       from: notifi['from'],
+  //       to: notifi['to'],
+  //       message: notifi['message'],
+  //       status: "read",
+  //       claimState: notifi['claimState'],
+  //       date: DateTime.parse(notifi['date'].toDate().toString()));
 
-    notificationservice.updateNotification(notification);
-  }
+  //   notificationservice.updateNotification(notification);
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -176,6 +179,7 @@ class _FarmerDashboardState extends State<FarmerDashboard> {
                                 MaterialPageRoute(
                                     builder: (context) => ViewNotificationList(
                                         uid: widget.uid,
+                                        notifications_all_list: _notifications,
                                         notification_list: notification_list)),
                               );
                             },
