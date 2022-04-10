@@ -71,7 +71,7 @@ class NotificationTile extends StatelessWidget {
                   ),
                 ],
               ),
-              tileColor: Color.fromARGB(255, 218, 249, 232),
+              tileColor: const Color.fromARGB(255, 218, 249, 232),
               //trailing: ,
             ),
           ],

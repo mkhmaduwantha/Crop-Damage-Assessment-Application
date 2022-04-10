@@ -137,7 +137,39 @@ class _FarmerDashboardState extends State<FarmerDashboard> {
                         // automaticallyImplyLeading: false,
                         actions: <Widget>[
                           IconButton(
-                            icon: const Icon(Icons.notifications),
+                            // icon: const Icon(Icons.notifications),
+                            icon: Stack(
+                              children: <Widget>[
+                                const Icon(Icons.notifications),
+                                Visibility(
+                                  child: Positioned(
+                                    right: 0,
+                                    child: Container(
+                                      padding: const EdgeInsets.all(1),
+                                      decoration: BoxDecoration(
+                                        color: Colors.red,
+                                        borderRadius: BorderRadius.circular(6),
+                                      ),
+                                      constraints: const BoxConstraints(
+                                        minWidth: 12,
+                                        minHeight: 12,
+                                      ),
+                                      child: Text(
+                                        notification_list.length.toString(),
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 8,
+                                        ),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                    ),
+                                  ),
+                                  visible: notification_list.isNotEmpty,
+                                ),
+
+
+                              ],
+                            ),
                             onPressed: () {
                               Navigator.push(
                                 context,
