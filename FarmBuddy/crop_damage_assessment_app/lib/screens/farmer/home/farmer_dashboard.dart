@@ -1,4 +1,5 @@
 import 'package:crop_damage_assessment_app/screens/farmer/home/filter.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -42,6 +43,16 @@ class _FarmerDashboardState extends State<FarmerDashboard> {
   void initState() {
     super.initState();
     initFarmer();
+
+    // FirebaseMessaging.instance.getInitialMessage();
+
+    // //foreground
+    // FirebaseMessaging.onMessage.listen((message){
+    //   if(message.notification != null){
+    //       print(message.notification!.body);
+    //       print(message.notification!.title);
+    //   }
+    // });
   }
 
   @override
