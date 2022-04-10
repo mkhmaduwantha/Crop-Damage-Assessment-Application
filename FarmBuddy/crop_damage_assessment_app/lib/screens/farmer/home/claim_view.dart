@@ -249,7 +249,7 @@ class _ClaimViewState extends State<ClaimView> {
                 const SizedBox(height: 20.0),
                 Align(
                   alignment: Alignment.centerLeft,
-                  child: officer != null ?
+                  child: officer != null && widget.claim!.approved_by!= "" ?
                     Text(
                       "Review by - " + officer!.name +
                       "\nOfficer contact - " + officer!.phone_no +
