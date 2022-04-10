@@ -50,6 +50,8 @@ dependencies:
   timeago: ^3.2.2
   geolocator: ^8.2.0
   latlng: any
+  intl: ^0.17.0
+  uuid: ^3.0.6
   # flutter_datetime_picker: ^1.5.1
   shared_preferences: ^2.0.13
   flutter_datetime_picker:

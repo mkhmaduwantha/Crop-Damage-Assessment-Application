@@ -6,8 +6,12 @@ import 'package:cool_alert/cool_alert.dart';
 import 'package:video_player/video_player.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:crop_damage_assessment_app/models/claim.dart';
+import 'package:crop_damage_assessment_app/models/notification.dart'
+    as fnotification;
 import 'package:crop_damage_assessment_app/components/loading.dart';
 import 'package:crop_damage_assessment_app/components/decoration.dart';
+import 'package:uuid/uuid.dart';
+import '../../notification/notification.dart';
 
 class ClaimView extends StatefulWidget {
   final Claim? claim;
@@ -27,6 +31,7 @@ class _ClaimProfileState extends State<ClaimView> {
   late List<Widget> imageSliders = [];
   late List<dynamic> claim_image_urls_list = [];
   late VideoPlayerController _videoPlayerController;
+  final NotificationService notificationservice = NotificationService();
 
   final List<String> claim_states = ['Pending', 'Approve', 'Reject'];
 
@@ -135,6 +140,39 @@ class _ClaimProfileState extends State<ClaimView> {
   void initState() {
     super.initState();
     initClaimImages();
+  }
+
+  
+  _addNotification(String action) async {
+    String claim_id = widget.claim!.claim_id;
+    String to = widget.claim!.uid;
+    String from = widget.uid!;
+    String state = "unread";
+    String text = "";
+    DateTime time = DateTime.now();
+    String claimState = "";
+
+    if (action == "Approve") {
+      text =
+          "Your claim ( claim id : $claim_id ) has been approved!";
+      claimState = "Approved";
+    } else if (action == "Reject") {
+      text = "Your claim ( claim id : $claim_id ) has been rejected!";
+      claimState = "Rejected";
+    }
+
+    String notificationid = Uuid().v4();
+    final notification = fnotification.Notification(notificationid,
+        from: from,
+        to: to,
+        message: text,
+        status: state,
+        claimState: claimState,
+        date: time);
+
+    notificationservice.addNotification(notification);
+
+    print("Add notification");
   }
 
   @override
@@ -320,6 +358,7 @@ class _ClaimProfileState extends State<ClaimView> {
                       });
 
                       if (isSuccess) {
+                        _addNotification(currentState);
                         triggerSuccessAlert();
                       } else {
                         triggerErrorAlert();

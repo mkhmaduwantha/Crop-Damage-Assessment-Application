@@ -1,8 +1,11 @@
 import 'package:crop_damage_assessment_app/models/notification_model.dart';
+import 'package:crop_damage_assessment_app/models/notification.dart'
+    as fnotification;
 import 'package:crop_damage_assessment_app/screens/farmer/home/filter.dart';
 import 'package:crop_damage_assessment_app/screens/notification/view_notification_list.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:crop_damage_assessment_app/models/claim.dart';
@@ -12,6 +15,8 @@ import 'package:crop_damage_assessment_app/components/loading.dart';
 import 'package:crop_damage_assessment_app/screens/farmer/home/add_claim.dart';
 import 'package:crop_damage_assessment_app/screens/farmer/home/edit_farmer.dart';
 import 'package:crop_damage_assessment_app/screens/farmer/home/view_claim_list.dart';
+
+import '../../notification/notification.dart';
 
 class FarmerDashboard extends StatefulWidget {
   const FarmerDashboard({Key? key, required this.uid}) : super(key: key);
@@ -26,6 +31,9 @@ class _FarmerDashboardState extends State<FarmerDashboard> {
   final AuthService _auth = AuthService();
   late DatabaseService db;
   bool loading = true;
+  final NotificationService notificationservice = NotificationService();
+  int ncount = 0;
+  List<dynamic> _notifications = [];
   List<NotificationModel> notification_list = [];
 
   var filter = {"claim_state": "", "agrarian_division": ""};
@@ -61,7 +69,7 @@ class _FarmerDashboardState extends State<FarmerDashboard> {
   void initState() {
     super.initState();
     initFarmer();
-
+    _getAllNotifications();
     // Maduwantha : load list of notification list in here............................... notification_list = [........];
 
     // FirebaseMessaging.instance.getInitialMessage();
@@ -74,6 +82,65 @@ class _FarmerDashboardState extends State<FarmerDashboard> {
     //   }
     // });
 
+  }
+  
+  _getAllNotifications() async {
+    String uid = widget.uid!;
+    var allnotifications =
+        await notificationservice.fetchAllNotificationDetails(uid);
+    allnotifications.forEach((notification) {
+      print(notification['to']+"------------------------------------------------------------");
+      if (notification['status'] == 'unread') {
+        setState(() {
+          _notifications.add(notification);
+        });
+      }
+    });
+    _notifications.sort((a, b) => b['date'].compareTo(a['date']));
+    await _createList();
+  }
+
+  _createList() async {
+    await Future.forEach(_notifications, (dynamic element) async {
+      var claimState = element['claimState'];
+      var datetime = DateFormat.jm()
+          .add_yMd()
+          .format(DateTime.parse(element['date'].toDate().toString()));
+      var message = element['message'];
+
+      var from = "";
+      String avartarIcon = "";
+
+      if (claimState == "Rejected") {
+        avartarIcon = '🔴';
+        from = "Officer";
+      } else if (claimState == "Approved") {
+        avartarIcon = '🟢';
+        from = "Officer";
+      }
+
+      var model = NotificationModel(
+          avatarIcon: avartarIcon,
+          from: from,
+          datetime: datetime,
+          message: message);
+      notification_list.add(model);
+    });
+
+    setState(() {});
+  }
+
+  _updateNotification(int index) async {
+    dynamic notifi = _notifications[index];
+    final notification = fnotification.Notification(notifi['notificationid'],
+        from: notifi['from'],
+        to: notifi['to'],
+        message: notifi['message'],
+        status: "read",
+        claimState: notifi['claimState'],
+        date: DateTime.parse(notifi['date'].toDate().toString()));
+
+    notificationservice.updateNotification(notification);
   }
 
   @override
