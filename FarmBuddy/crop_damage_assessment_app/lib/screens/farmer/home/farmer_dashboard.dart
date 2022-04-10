@@ -173,8 +173,8 @@ class _FarmerDashboardState extends State<FarmerDashboard> {
 
                               ],
                             ),
-                            onPressed: () {
-                              Navigator.push(
+                            onPressed: ()  async {
+                              final filter_result = await Navigator.push(
                                 context,
                                 MaterialPageRoute(
                                     builder: (context) => ViewNotificationList(
@@ -182,6 +182,20 @@ class _FarmerDashboardState extends State<FarmerDashboard> {
                                         notifications_all_list: _notifications,
                                         notification_list: notification_list)),
                               );
+                              print("this is filter result");
+                              print(filter_result);
+                              Type type = filter_result.runtimeType;
+                              
+                              print(filter_result != null);
+                              
+                              if (filter_result != null && filter_result){
+                                
+                              // if (filter_result != null && filter_result) {
+                                Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (BuildContext context) => super.widget));
+                              }
                             },
                           ),
                           IconButton(

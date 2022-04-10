@@ -117,11 +117,12 @@ class _NotificationTileState extends State<NotificationTile> {
               //trailing: ,
               onTap: () {
                 _updateNotification();
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => FarmerDashboard(uid: widget.uid)),
-                );
+                Navigator.pop(context, true);
+                // Navigator.push(
+                //   context,
+                //   MaterialPageRoute(
+                //       builder: (context) => FarmerDashboard(uid: widget.uid)),
+                // );
               },
             ),
           ],
