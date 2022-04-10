@@ -1,4 +1,6 @@
+import 'package:crop_damage_assessment_app/models/notification_model.dart';
 import 'package:crop_damage_assessment_app/screens/farmer/home/filter.dart';
+import 'package:crop_damage_assessment_app/screens/notification/view_notification_list.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -24,6 +26,7 @@ class _FarmerDashboardState extends State<FarmerDashboard> {
   final AuthService _auth = AuthService();
   late DatabaseService db;
   bool loading = true;
+  List<NotificationModel> notification_list = [];
 
   var filter = {"claim_state": "", "agrarian_division": ""};
 
@@ -39,10 +42,27 @@ class _FarmerDashboardState extends State<FarmerDashboard> {
     });
   }
 
+  
+    void _showNotificationPanel(BuildContext context) {
+      showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        builder: (context) {
+          return Container(
+            padding:
+                const EdgeInsets.symmetric(vertical: 20.0, horizontal: 60.0),
+            child: ViewNotificationList(uid: widget.uid, notification_list: notification_list),
+          );
+        }
+      );
+    }
+
   @override
   void initState() {
     super.initState();
     initFarmer();
+
+    // Maduwantha : load list of notification list in here............................... notification_list = [........];
 
     // FirebaseMessaging.instance.getInitialMessage();
 
@@ -53,6 +73,7 @@ class _FarmerDashboardState extends State<FarmerDashboard> {
     //       print(message.notification!.title);
     //   }
     // });
+
   }
 
   @override
@@ -76,6 +97,11 @@ class _FarmerDashboardState extends State<FarmerDashboard> {
                         elevation: 0.0,
                         // automaticallyImplyLeading: false,
                         actions: <Widget>[
+                            IconButton(
+                              icon: const Icon(Icons.notifications),
+                              onPressed: () => _showNotificationPanel(context),
+                            ),
+
                           IconButton(
                               icon: const Icon(Icons.power_settings_new),
                               onPressed: () async {

@@ -27,7 +27,7 @@ class _ClaimPanelState extends State<ClaimPanel> {
           return <Widget>[
             SliverAppBar(
               title: const Text('View Claim'),
-              backgroundColor: const Color.fromARGB(255, 105, 184, 109),
+              backgroundColor: const Color.fromARGB(255, 122, 156, 122),
               elevation: 0.0,
               actions: <Widget>[
                 IconButton(
@@ -43,7 +43,7 @@ class _ClaimPanelState extends State<ClaimPanel> {
                 indicatorPadding: const EdgeInsets.all(10),
                 indicator: BoxDecoration(
                   borderRadius: BorderRadius.circular(3),
-                  color: const Color.fromARGB(255, 74, 236, 128),
+                  color: const Color.fromARGB(255, 53, 92, 66),
                 ),
                 tabs: const [
                   Tab(child: Text('Claim')),

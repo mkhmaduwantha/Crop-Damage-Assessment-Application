@@ -484,6 +484,16 @@ class _AddClaimState extends State<AddClaim> {
                           color: Color.fromARGB(255, 32, 196, 100)),
                     ),
                   ),
+                  const Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      'Make sure to turn on location while using camera',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 13.0,
+                          color: Color.fromARGB(255, 104, 104, 104)),
+                    ),
+                  ),
                   const SizedBox(height: 20.0),
                   ClipRRect(
                     borderRadius: BorderRadius.circular(30.0),
