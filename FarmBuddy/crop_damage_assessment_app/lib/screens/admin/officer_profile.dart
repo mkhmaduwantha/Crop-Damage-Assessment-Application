@@ -1,12 +1,12 @@
+import 'package:crop_damage_assessment_app/models/officer.dart';
 import 'package:flutter/material.dart';
 import 'package:cool_alert/cool_alert.dart';
 import 'package:crop_damage_assessment_app/services/auth.dart';
-import 'package:crop_damage_assessment_app/models/farmer.dart';
 import 'package:crop_damage_assessment_app/services/database.dart';
 import 'package:crop_damage_assessment_app/components/loading.dart';
 import 'package:crop_damage_assessment_app/screens/admin/admin_dashboard.dart';
 
-Farmer? user;
+Officer? user;
 
 class OfficerProfile extends StatefulWidget {
   final String? uid;
@@ -26,7 +26,7 @@ class _OfficerProfileState extends State<OfficerProfile> {
 
   void getUserProfileData() async {
     //use a Async-await function to get the data
-    final select_user = await DatabaseService(uid: widget.uid).getUserData(widget.officer_uid);
+    final select_user = await DatabaseService(uid: widget.uid).getOfficerData(widget.officer_uid);
     setState(() {
       user = select_user;
       loading = false;

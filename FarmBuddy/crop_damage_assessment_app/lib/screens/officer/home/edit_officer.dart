@@ -2,14 +2,14 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:cool_alert/cool_alert.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:crop_damage_assessment_app/models/farmer.dart';
 import 'package:crop_damage_assessment_app/services/auth.dart';
+import 'package:crop_damage_assessment_app/models/officer.dart';
 import 'package:crop_damage_assessment_app/services/database.dart';
 import 'package:crop_damage_assessment_app/components/loading.dart';
 import 'package:crop_damage_assessment_app/components/decoration.dart';
 import 'package:crop_damage_assessment_app/screens/officer/home/officer_dashboard.dart';
 
-Farmer? user;
+Officer? user;
 
 class OfficerEditData extends StatefulWidget {
   const OfficerEditData({Key? key, required this.uid}) : super(key: key);
@@ -66,7 +66,7 @@ class _OfficerEditDataState extends State<OfficerEditData> {
 
 
   void getUserProfileData() async {
-    final select_user = await DatabaseService(uid: widget.uid).getUserData(widget.uid);
+    final select_user = await DatabaseService(uid: widget.uid).getOfficerData(widget.uid);
     setState(() {
       user = select_user;
       name = select_user!.name;

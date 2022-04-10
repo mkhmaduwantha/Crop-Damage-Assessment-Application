@@ -3,7 +3,6 @@ import 'package:crop_damage_assessment_app/screens/farmer/home/claim_view.dart';
 import 'package:crop_damage_assessment_app/services/database.dart';
 import 'package:flutter/material.dart';
 import 'package:crop_damage_assessment_app/models/claim.dart';
-import 'package:crop_damage_assessment_app/models/user.dart';
 import 'package:crop_damage_assessment_app/services/auth.dart';
 
 class ClaimPanel extends StatefulWidget {
@@ -56,7 +55,7 @@ class _ClaimPanelState extends State<ClaimPanel> {
         },
         body: TabBarView(
           children: <Widget>[
-            ClaimView(claim: widget.claim),
+            ClaimView(uid: widget.claim!.uid, claim: widget.claim),
             ClaimProfile(uid: widget.claim!.uid, claim_uid: widget.claim!.uid)
           ],
         ),

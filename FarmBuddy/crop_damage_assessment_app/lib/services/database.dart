@@ -19,7 +19,6 @@ class DatabaseService {
     this.select_uid = select_uid;
   }
 
-
   // collection reference
   final CollectionReference user_collection =
       FirebaseFirestore.instance.collection('user');
@@ -31,7 +30,9 @@ class DatabaseService {
   }
 
   String getProfileUrl(QueryDocumentSnapshot doc, String field) {
-    return doc.data().toString().contains(field) ? doc.get(field) : "https://firebasestorage.googleapis.com/v0/b/farm-buddy-app.appspot.com/o/assets%2Fuser.png?alt=media&token=b965e689-f777-4d32-9702-bc8f8ec19355";
+    return doc.data().toString().contains(field)
+        ? doc.get(field)
+        : "https://firebasestorage.googleapis.com/v0/b/farm-buddy-app.appspot.com/o/assets%2Fuser.png?alt=media&token=b965e689-f777-4d32-9702-bc8f8ec19355";
   }
 
   int getInt(QueryDocumentSnapshot doc, String field) {
@@ -72,7 +73,8 @@ class DatabaseService {
         estimate: getString(doc, "estimate"),
         claim_image_urls: doc['claim_image_urls'] ?? [],
         claim_video_url: getString(doc, "claim_video_url"),
-        claim_location: LatLng(doc['claim_location'].latitude, doc['claim_location'].longitude),
+        claim_location: LatLng(
+            doc['claim_location'].latitude, doc['claim_location'].longitude),
         comment: getString(doc, "comment"),
         approved_by: getString(doc, "approved_by"),
       );
@@ -83,17 +85,16 @@ class DatabaseService {
   List<Officer?> _officerDataFromSnapshot(QuerySnapshot snapshot) {
     return snapshot.docs.map((doc) {
       return Officer(
-        uid: getString(doc, "uid"),
-        phone_no: getString(doc, "phone_no"),
-        name: getString(doc, "name"),
-        email: getString(doc, "email"),
-        type: getString(doc, "type"),
-        agrarian_division: getString(doc, "agrarian_division"),
-        province: getString(doc, "province"),
-        nic: getString(doc, "nic"),
-        address: getString(doc, "address"),
-        profile_url: getProfileUrl(doc, "profile_url")
-      );
+          uid: getString(doc, "uid"),
+          phone_no: getString(doc, "phone_no"),
+          name: getString(doc, "name"),
+          email: getString(doc, "email"),
+          type: getString(doc, "type"),
+          agrarian_division: getString(doc, "agrarian_division"),
+          province: getString(doc, "province"),
+          nic: getString(doc, "nic"),
+          address: getString(doc, "address"),
+          profile_url: getProfileUrl(doc, "profile_url"));
     }).toList();
   }
 
@@ -131,14 +132,15 @@ class DatabaseService {
     return isSuccess;
   }
 
-  Future<Farmer?> getUserData(String? select_uid) async {
+  Future<Farmer?> getFarmerData(String? select_uid) async {
     Farmer? user;
     await user_collection
         .doc(select_uid)
         .get()
         .then((DocumentSnapshot documentSnapshot) {
       if (documentSnapshot.exists) {
-        Map<String, dynamic> data = documentSnapshot.data() as Map<String, dynamic>;
+        Map<String, dynamic> data =
+            documentSnapshot.data() as Map<String, dynamic>;
         user = Farmer(
             uid: data['uid'] ?? "",
             phone_no: data['phone_no'] ?? "",
@@ -153,6 +155,34 @@ class DatabaseService {
             account_name: data['account_name'] ?? "",
             account_no: data['account_no'] ?? "",
             branch: data['branch'] ?? "",
+            profile_url: data['profile_url'] ?? "");
+      } else {
+        print('User does not exist on the database');
+      }
+    });
+
+    return user;
+  }
+
+  Future<Officer?> getOfficerData(String? select_uid) async {
+    Officer? user;
+    await user_collection
+        .doc(select_uid)
+        .get()
+        .then((DocumentSnapshot documentSnapshot) {
+      if (documentSnapshot.exists) {
+        Map<String, dynamic> data =
+            documentSnapshot.data() as Map<String, dynamic>;
+        user = Officer(
+            uid: data['uid'] ?? "",
+            phone_no: data['phone_no'] ?? "",
+            name: data['name'] ?? "",
+            email: data['email'] ?? "",
+            type: data['type'] ?? "",
+            agrarian_division: data['agrarian_division'] ?? "",
+            nic: data['nic'] ?? "",
+            address: data['address'] ?? "",
+            province: data['province'] ?? "",
             profile_url: data['profile_url'] ?? "");
       } else {
         print('User does not exist on the database');
@@ -209,7 +239,6 @@ class DatabaseService {
   }
 
   Stream<List<Claim?>> farmerClaimList(String? select_claim_state) {
-
     return claim_collection
         .orderBy('timestamp', descending: true)
         .where('uid', isEqualTo: select_uid)
@@ -218,8 +247,8 @@ class DatabaseService {
         .map(_claimDataFromSnapshot);
   }
 
-  Stream<List<Claim?>> officerClaimList( String? select_claim_state, String? select_agrarian_division) {
-
+  Stream<List<Claim?>> officerClaimList(
+      String? select_claim_state, String? select_agrarian_division) {
     return claim_collection
         .orderBy('timestamp', descending: true)
         .where('status', isEqualTo: select_claim_state)
@@ -228,9 +257,7 @@ class DatabaseService {
         .map(_claimDataFromSnapshot);
   }
 
-
-    Stream<List<Officer?>> get officerList{
-
+  Stream<List<Officer?>> get officerList {
     return user_collection
         .where('type', isGreaterThanOrEqualTo: "officer")
         // .where('type',arrayContainsAny: ['officer', 'officer_pending'])
