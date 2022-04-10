@@ -25,47 +25,36 @@ class _ViewNotificationListState extends State<ViewNotificationList> {
 
     return loading
         ? const Loading()
-        : Container(
+        : Scaffold(
+            backgroundColor: const Color.fromARGB(255, 242, 255, 243),
+            resizeToAvoidBottomInset: false,
+            appBar: AppBar(
+              title: const Text('Notifications'),
+              backgroundColor: const Color.fromARGB(255, 122, 156, 122),
+              elevation: 0.0,
+            ),
+            body:Container(
             padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 30.0),
             child: 
-
-            Column(
-              children: <Widget>[
-                const SizedBox(height: 40.0),
-                  const Align(
-                    alignment: Alignment.topCenter,
-                    child: Text(
-                      "Notifications",
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 22.0,
-                          color: Color.fromARGB(255, 80, 79, 79)),
-                    )
-                  ),
-
-                const SizedBox(height: 30.0),
-
-                widget.notification_list.isNotEmpty? 
+            
+              widget.notification_list.isNotEmpty? 
                   ListView.builder(
                     itemCount: widget.notification_list.length,
                     itemBuilder: (context, index) {
                       return NotificationTile(notification: widget.notification_list[index]);
                     },
                   )
-                : const Align(
+                : 
+                const Align(
                     alignment: Alignment.topCenter,
                     child: Text(
-                      "Empty",
+                      "No Notifications",
                       style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 18.0,
                           color: Color.fromARGB(255, 80, 79, 79)),
-                    ))
-                ],
-
-            ),
-            
-            
-              );
+                    )
+                )
+        ));
   }
 }

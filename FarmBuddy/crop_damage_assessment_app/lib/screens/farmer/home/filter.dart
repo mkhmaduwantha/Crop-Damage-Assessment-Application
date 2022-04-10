@@ -53,45 +53,45 @@ class _FilterState extends State<Filter> {
             ),
             body: SingleChildScrollView(
                 padding: const EdgeInsets.symmetric( vertical: 20.0, horizontal: 50.0),
-                child:
-                Form(
-            key: _formKey,
-            child: Column(
-              children: <Widget>[
-                const SizedBox(height: 40.0),
-                DropdownButtonFormField(
-                  value: currentState,
-                  decoration: textInputDecoration,
-                  items: claim_states.map((claim_state_option) {
-                    return DropdownMenuItem(
-                      value: claim_state_option,
-                      child: Text(claim_state_option),
-                    );
-                  }).toList(),
-                  onChanged: (String? newValue) {
-                    setState(() {
-                      currentState = newValue!;
-                    });
-                  },
-                ),
-                
-                const SizedBox(height: 20.0),
-                ElevatedButton(
-                    child: const Text(
-                      'Update',
-                      style: TextStyle(color: Colors.white),
-                    ),
-                    onPressed: () async {
-                      if (_formKey.currentState != null &&  _formKey.currentState!.validate()) {
-                        final preference = await SharedPreferences.getInstance();
-                        await preference.setString("claim_state", currentState);
-                        Navigator.pop(context, true);
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    children: <Widget>[
+                      const SizedBox(height: 40.0),
+                      DropdownButtonFormField(
+                        value: currentState,
+                        decoration: textInputDecoration,
+                        items: claim_states.map((claim_state_option) {
+                          return DropdownMenuItem(
+                            value: claim_state_option,
+                            child: Text(claim_state_option),
+                          );
+                        }).toList(),
+                        onChanged: (String? newValue) {
+                          setState(() {
+                            currentState = newValue!;
+                          });
+                        },
+                      ),
+                      
+                      const SizedBox(height: 20.0),
+                      ElevatedButton(
+                          child: const Text(
+                            'Update',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                          onPressed: () async {
+                            if (_formKey.currentState != null &&  _formKey.currentState!.validate()) {
+                              final preference = await SharedPreferences.getInstance();
+                              await preference.setString("claim_state", currentState);
+                              Navigator.pop(context, true);
 
-                      }
-                    }),
-              ],
-            ),
-          )),
+                            }
+                          }),
+                    ],
+                  ),
+                )
+          ),
           );
   }
 }

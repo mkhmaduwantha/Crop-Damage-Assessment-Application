@@ -50,27 +50,11 @@ class _FarmerDashboardState extends State<FarmerDashboard> {
     });
   }
 
-  
-    void _showNotificationPanel(BuildContext context) {
-      showModalBottomSheet(
-        context: context,
-        isScrollControlled: true,
-        builder: (context) {
-          return Container(
-            padding:
-                const EdgeInsets.symmetric(vertical: 20.0, horizontal: 60.0),
-            child: ViewNotificationList(uid: widget.uid, notification_list: notification_list),
-          );
-        }
-      );
-    }
-
   @override
   void initState() {
     super.initState();
     initFarmer();
     _getAllNotifications();
-    // Maduwantha : load list of notification list in here............................... notification_list = [........];
 
     // FirebaseMessaging.instance.getInitialMessage();
 
@@ -81,15 +65,15 @@ class _FarmerDashboardState extends State<FarmerDashboard> {
     //       print(message.notification!.title);
     //   }
     // });
-
   }
-  
+
   _getAllNotifications() async {
     String uid = widget.uid!;
     var allnotifications =
         await notificationservice.fetchAllNotificationDetails(uid);
     allnotifications.forEach((notification) {
-      print(notification['to']+"------------------------------------------------------------");
+      print(notification['to'] +
+          "------------------------------------------------------------");
       if (notification['status'] == 'unread') {
         setState(() {
           _notifications.add(notification);
@@ -109,21 +93,9 @@ class _FarmerDashboardState extends State<FarmerDashboard> {
       var message = element['message'];
 
       var from = "";
-      String avartarIcon = "";
 
-      if (claimState == "Rejected") {
-        avartarIcon = '🔴';
-        from = "Officer";
-      } else if (claimState == "Approved") {
-        avartarIcon = '🟢';
-        from = "Officer";
-      }
 
-      var model = NotificationModel(
-          avatarIcon: avartarIcon,
-          from: from,
-          datetime: datetime,
-          message: message);
+      var model = NotificationModel( status: claimState, from: from, datetime: datetime, message: message);
       notification_list.add(model);
     });
 
@@ -164,11 +136,18 @@ class _FarmerDashboardState extends State<FarmerDashboard> {
                         elevation: 0.0,
                         // automaticallyImplyLeading: false,
                         actions: <Widget>[
-                            IconButton(
-                              icon: const Icon(Icons.notifications),
-                              onPressed: () => _showNotificationPanel(context),
-                            ),
-
+                          IconButton(
+                            icon: const Icon(Icons.notifications),
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => ViewNotificationList(
+                                        uid: widget.uid,
+                                        notification_list: notification_list)),
+                              );
+                            },
+                          ),
                           IconButton(
                               icon: const Icon(Icons.power_settings_new),
                               onPressed: () async {
@@ -215,13 +194,15 @@ class _FarmerDashboardState extends State<FarmerDashboard> {
                           final filter_result = await Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => Filter(uid: widget.uid)));
+                                  builder: (context) =>
+                                      Filter(uid: widget.uid)));
 
                           if (filter_result! && filter_result) {
                             Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (BuildContext context) => super.widget));
+                                context,
+                                MaterialPageRoute(
+                                    builder: (BuildContext context) =>
+                                        super.widget));
                           }
                         },
                       ),

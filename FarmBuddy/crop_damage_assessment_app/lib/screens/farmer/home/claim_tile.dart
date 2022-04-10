@@ -32,23 +32,28 @@ class ClaimTile extends StatelessWidget {
     return completer.future;
   }
 
-  TextStyle getColorCode(String? status) {
-
+  TextStyle getStatusCode(String? status) {
     switch (status) {
       case "Pending":
-        return const TextStyle(fontWeight: FontWeight.bold, color: Color.fromARGB(255, 198, 167, 11));
+        return const TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Color.fromARGB(255, 198, 167, 11));
 
       case "Approve":
-        return const TextStyle(fontWeight: FontWeight.bold, color: Color.fromARGB(255, 14, 129, 81));
+        return const TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Color.fromARGB(255, 14, 129, 81));
 
       case "Reject":
-        return const TextStyle(fontWeight: FontWeight.bold, color: Color.fromARGB(255, 193, 30, 30));
+        return const TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Color.fromARGB(255, 193, 30, 30));
 
       default:
-        return const TextStyle(fontWeight: FontWeight.bold, color: Color.fromARGB(255, 198, 167, 11));
-
+        return const TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Color.fromARGB(255, 198, 167, 11));
     }
-    
   }
 
   @override
@@ -112,7 +117,7 @@ class ClaimTile extends StatelessWidget {
               ),
               trailing: Text(
                 claim!.status,
-                style: getColorCode(claim!.status),
+                style: getStatusCode(claim!.status),
               ),
               onTap: () {
                 Navigator.push(

@@ -65,14 +65,11 @@ class _OfficerDashboardState extends State<OfficerDashboard> {
             value: db.officerClaimList(filter["claim_state"], filter["agrarian_division"]),
             initialData: const [],
             child: Scaffold(
-              body: NestedScrollView(
-                  headerSliverBuilder:
-                      (BuildContext context, bool innerBoxIsScrolled) {
+              body: NestedScrollView( headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
                     return <Widget>[
                       SliverAppBar(
                           title: const Text('Farm Buddy - Officer'),
-                          backgroundColor:
-                              const Color.fromARGB(255, 201, 195, 117),
+                          backgroundColor: const Color.fromARGB(255, 201, 195, 117),
                           elevation: 0.0,
                           actions: <Widget>[
                             // IconButton(
