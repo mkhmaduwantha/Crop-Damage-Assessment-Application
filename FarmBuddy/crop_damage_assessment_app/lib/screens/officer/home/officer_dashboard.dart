@@ -106,7 +106,7 @@ class _OfficerDashboardState extends State<OfficerDashboard> {
                             MaterialPageRoute(
                                 builder: (context) => Filter(uid: widget.uid)));
 
-                        if (filter_result! && filter_result) {
+                        if (filter_result != null && filter_result) {
                           Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(

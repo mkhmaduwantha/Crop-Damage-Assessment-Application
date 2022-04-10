@@ -50,7 +50,7 @@ class _NotificationTileState extends State<NotificationTile> {
         claimState: notifi['claimState'],
         date: DateTime.parse(notifi['date'].toDate().toString()));
         
-    notificationservice.updateNotification(notification);
+    await notificationservice.updateNotification(notification);
   }
 
   Icon getStatusIcon(String status) {
@@ -115,8 +115,8 @@ class _NotificationTileState extends State<NotificationTile> {
               ),
               tileColor: const Color.fromARGB(255, 218, 249, 232),
               //trailing: ,
-              onTap: () {
-                _updateNotification();
+              onTap: () async {
+                await _updateNotification();
                 Navigator.pop(context, true);
                 // Navigator.push(
                 //   context,
