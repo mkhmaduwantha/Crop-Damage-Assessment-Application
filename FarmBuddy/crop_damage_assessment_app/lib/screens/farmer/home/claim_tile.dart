@@ -21,12 +21,34 @@ class ClaimTile extends StatelessWidget {
       if (info.image.width == 80 && info.image.height == 160) {
         completer.complete(const Text('No Image'));
       } else {
-        completer.complete(Image(image: image, width: 400,));
+        completer.complete(Image(
+          image: image,
+          width: 400,
+        ));
       }
     });
 
     load.addListener(listener);
     return completer.future;
+  }
+
+  TextStyle getColorCode(String? status) {
+
+    switch (status) {
+      case "Pending":
+        return const TextStyle(fontWeight: FontWeight.bold, color: Color.fromARGB(255, 198, 167, 11));
+
+      case "Approve":
+        return const TextStyle(fontWeight: FontWeight.bold, color: Color.fromARGB(255, 14, 129, 81));
+
+      case "Reject":
+        return const TextStyle(fontWeight: FontWeight.bold, color: Color.fromARGB(255, 193, 30, 30));
+
+      default:
+        return const TextStyle(fontWeight: FontWeight.bold, color: Color.fromARGB(255, 198, 167, 11));
+
+    }
+    
   }
 
   @override
@@ -38,10 +60,9 @@ class ClaimTile extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-
             Container(
               alignment: Alignment.center,
-              height:200,
+              height: 200,
               child: FutureBuilder<Widget>(
                 future: getImage(),
                 builder: (context, claim_snapshot) {
@@ -53,36 +74,34 @@ class ClaimTile extends StatelessWidget {
                 },
               ),
             ),
-
             ListTile(
-              isThreeLine : true,
-              title: Text(claim!.claim_name, 
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16.0,
-                          color: Color.fromARGB(255, 0, 0, 0)
-                        )
-                      ),
-
+              isThreeLine: true,
+              title: Text(claim!.claim_name,
+                  style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16.0,
+                      color: Color.fromARGB(255, 0, 0, 0))),
               subtitle: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
                   Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
-                      "Crop Type - " + claim!.crop_type + "\nReason - " + claim!.reason,
+                      "Crop Type - " +
+                          claim!.crop_type +
+                          "\nReason - " +
+                          claim!.reason,
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
-                          fontSize: 15.0,
-                          color: Color.fromARGB(255, 0, 0, 0)),
+                          fontSize: 15.0, color: Color.fromARGB(255, 0, 0, 0)),
                     ),
                   ),
-
                   const SizedBox(height: 10.0),
                   Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
-                      timeago.format(DateTime.fromMillisecondsSinceEpoch(claim!.timestamp)),
+                      timeago.format(DateTime.fromMillisecondsSinceEpoch(
+                          claim!.timestamp)),
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
                           fontSize: 13.0,
@@ -91,11 +110,15 @@ class ClaimTile extends StatelessWidget {
                   ),
                 ],
               ),
-              trailing: Text(claim!.status),
+              trailing: Text(
+                claim!.status,
+                style: getColorCode(claim!.status),
+              ),
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => ClaimPanel(claim:claim)),
+                  MaterialPageRoute(
+                      builder: (context) => ClaimPanel(claim: claim)),
                 );
               },
             ),
