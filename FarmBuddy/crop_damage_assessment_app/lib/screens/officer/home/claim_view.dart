@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:crop_damage_assessment_app/screens/officer/home/officer_dashboard.dart';
+import 'package:crop_damage_assessment_app/screens/officer/home/view_similar_list.dart';
 import 'package:crop_damage_assessment_app/services/database.dart';
 import 'package:flutter/material.dart';
 import 'package:cool_alert/cool_alert.dart';
@@ -17,14 +18,14 @@ class ClaimView extends StatefulWidget {
   final Claim? claim;
   final String? uid;
 
-  const ClaimView({Key? key, required this.uid, required this.claim}) : super(key: key);
+  const ClaimView({Key? key, required this.uid, required this.claim})
+      : super(key: key);
 
   @override
   _ClaimProfileState createState() => _ClaimProfileState();
 }
 
 class _ClaimProfileState extends State<ClaimView> {
-
   String comment = "";
   bool loading = false;
   late String currentState;
@@ -36,6 +37,7 @@ class _ClaimProfileState extends State<ClaimView> {
   final List<String> claim_states = ['Pending', 'Approve', 'Reject'];
 
   void initClaimImages() async {
+
     setState(() {
       claim_image_urls_list = widget.claim!.claim_image_urls;
       imageSliders = widget.claim!.claim_image_urls
@@ -45,7 +47,8 @@ class _ClaimProfileState extends State<ClaimView> {
                     borderRadius: const BorderRadius.all(Radius.circular(5.0)),
                     child: Stack(
                       children: <Widget>[
-                        Image.network(item, fit: BoxFit.fill, width: 2000.0, height: 1000),
+                        Image.network(item,
+                            fit: BoxFit.fill, width: 2000.0, height: 1000),
                         Positioned(
                           bottom: 0.0,
                           left: 0.0,
@@ -61,7 +64,8 @@ class _ClaimProfileState extends State<ClaimView> {
                                 end: Alignment.topCenter,
                               ),
                             ),
-                            padding: const EdgeInsets.symmetric( vertical: 10.0, horizontal: 20.0),
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 10.0, horizontal: 20.0),
                             child: Text(
                               'No. ${widget.claim!.claim_image_urls.indexOf(item) + 1} image',
                               style: const TextStyle(
@@ -86,7 +90,7 @@ class _ClaimProfileState extends State<ClaimView> {
             ..initialize().then((_) {
               setState(() {});
             });
-        _videoPlayerController.setLooping(true);
+      _videoPlayerController.setLooping(true);
       _videoPlayerController.initialize();
     }
 
@@ -95,9 +99,8 @@ class _ClaimProfileState extends State<ClaimView> {
       comment = widget.claim!.comment;
     });
 
-    // print(object);
-
   }
+
 
   void triggerSuccessAlert() {
     CoolAlert.show(
@@ -120,20 +123,17 @@ class _ClaimProfileState extends State<ClaimView> {
 
   void closeAlert() {
     Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(
-        builder: (context) =>
-        OfficerDashboard(uid: widget.uid))
-      );
+        context,
+        MaterialPageRoute(
+            builder: (context) => OfficerDashboard(uid: widget.uid)));
   }
 
   @override
   void dispose() {
     super.dispose();
-    if (widget.claim!.claim_video_url != "") { 
+    if (widget.claim!.claim_video_url != "") {
       _videoPlayerController.dispose();
     }
-    
   }
 
   @override
@@ -142,7 +142,6 @@ class _ClaimProfileState extends State<ClaimView> {
     initClaimImages();
   }
 
-  
   _addNotification(String action) async {
     String claim_id = widget.claim!.claim_id;
     String to = widget.claim!.uid;
@@ -153,8 +152,7 @@ class _ClaimProfileState extends State<ClaimView> {
     String claimState = "";
 
     if (action == "Approve") {
-      text =
-          "Your claim ( claim id : $claim_id ) has been approved!";
+      text = "Your claim ( claim id : $claim_id ) has been approved!";
       claimState = "Approved";
     } else if (action == "Reject") {
       text = "Your claim ( claim id : $claim_id ) has been rejected!";
@@ -180,7 +178,8 @@ class _ClaimProfileState extends State<ClaimView> {
     return loading
         ? const Loading()
         : SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 50.0),
+            padding:
+                const EdgeInsets.symmetric(vertical: 20.0, horizontal: 50.0),
             child: Column(
               children: <Widget>[
                 const SizedBox(height: 20.0),
@@ -215,7 +214,7 @@ class _ClaimProfileState extends State<ClaimView> {
                     style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 20.0,
-                        color: Color.fromARGB(255, 0, 0, 0)),
+                        color: Color.fromARGB(255, 146, 141, 85)),
                   ),
                 ),
                 Align(
@@ -246,9 +245,11 @@ class _ClaimProfileState extends State<ClaimView> {
                         "\nDamage Area - " +
                         widget.claim!.damage_area +
                         "\nEstimated Damage - " +
-                        widget.claim!.estimate + 
+                        widget.claim!.estimate +
                         "\nEstimated Location - " +
-                        widget.claim!.claim_location.latitude.toString() + " : " + widget.claim!.claim_location.longitude.toString(),
+                        widget.claim!.claim_location.latitude.toString() +
+                        " : " +
+                        widget.claim!.claim_location.longitude.toString(),
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
                         fontWeight: FontWeight.bold,
@@ -261,46 +262,85 @@ class _ClaimProfileState extends State<ClaimView> {
                   child: widget.claim!.claim_video_url != ""
                       ? _videoPlayerController.value.isInitialized
                           ? AspectRatio(
-                              aspectRatio: _videoPlayerController.value.aspectRatio,
+                              aspectRatio:
+                                  _videoPlayerController.value.aspectRatio,
                               child: VideoPlayer(_videoPlayerController),
                             )
                           : const Text('waiting for video to load')
                       : Container(),
                 ),
                 Align(
-                  alignment: Alignment.bottomCenter,
-                  child: widget.claim!.claim_video_url != "" && _videoPlayerController.value.isInitialized ?
-                    FloatingActionButton(
-                      onPressed: () {
-                        setState(() {
-                          _videoPlayerController.value.isPlaying
-                              ? _videoPlayerController.pause()
-                              : _videoPlayerController.play();
-                        });
-                      },
-                      child: Icon(
-                        _videoPlayerController.value.isPlaying
-                            ? Icons.pause
-                            : Icons.play_arrow,
-                      ),
-                    )
-                  :
-                  Container()
-                ),
+                    alignment: Alignment.bottomCenter,
+                    child: widget.claim!.claim_video_url != "" &&
+                            _videoPlayerController.value.isInitialized
+                        ? FloatingActionButton(
+                            onPressed: () {
+                              setState(() {
+                                _videoPlayerController.value.isPlaying
+                                    ? _videoPlayerController.pause()
+                                    : _videoPlayerController.play();
+                              });
+                            },
+                            child: Icon(
+                              _videoPlayerController.value.isPlaying
+                                  ? Icons.pause
+                                  : Icons.play_arrow,
+                            ),
+                          )
+                        : Container()),
 
-                const SizedBox(height: 30.0),
+
+                // const SizedBox(height: 20.0),
+                // const Align(
+                //   alignment: Alignment.centerLeft,
+                //   child: Text(
+                //     "Similer Claim",
+                //     overflow: TextOverflow.ellipsis,
+                //     style: TextStyle(
+                //         fontWeight: FontWeight.bold,
+                //         fontSize: 20.0,
+                //         color: Color.fromARGB(255, 146, 141, 85)),
+                //   ),
+                // ),
+
+                // const SizedBox(height: 20.0),
+                // similer_claims.isNotEmpty ?
+                //   ViewSimilarList(uid: widget.uid, similer_claims: similer_claims)
+                // :
+                // const Text(
+                //     "No similar claims",
+                //     overflow: TextOverflow.ellipsis,
+                //     style: TextStyle(
+                //         fontWeight: FontWeight.bold,
+                //         fontSize: 18.0,
+                //         color: Color.fromARGB(255, 62, 62, 62)),
+                //   ),
+
+
+
+                const SizedBox(height: 20.0),
+                const Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    "Claim Review",
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20.0,
+                        color: Color.fromARGB(255, 146, 141, 85)),
+                  ),
+                ),
+                const SizedBox(height: 40.0),
                 TextFormField(
                   keyboardType: TextInputType.text,
                   minLines: 3,
                   maxLines: 6,
-                  decoration:
-                  textInputDecoration.copyWith(hintText: 'Comment'),
+                  decoration: textInputDecoration.copyWith(hintText: 'Comment'),
                   initialValue: comment,
                   onChanged: (val) {
                     setState(() => comment = val);
                   },
                 ),
-
                 const SizedBox(height: 20.0),
                 DropdownButtonFormField(
                   value: currentState,
@@ -317,15 +357,13 @@ class _ClaimProfileState extends State<ClaimView> {
                     });
                   },
                 ),
-
                 const SizedBox(height: 20.0),
                 ElevatedButton(
-                  child: const Text(
-                          'Update',
-                          style: TextStyle(color: Colors.white),
-                  ),
-                  onPressed: () async {
-
+                    child: const Text(
+                      'Update',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    onPressed: () async {
                       setState(() {
                         loading = true;
                       });
@@ -344,15 +382,18 @@ class _ClaimProfileState extends State<ClaimView> {
                         "estimate": widget.claim!.estimate,
                         "claim_image_urls": widget.claim!.claim_image_urls,
                         "claim_video_url": widget.claim!.claim_video_url,
-                        "claim_location": GeoPoint(widget.claim!.claim_location.latitude, widget.claim!.claim_location.longitude),
+                        "claim_location": GeoPoint(
+                            widget.claim!.claim_location.latitude,
+                            widget.claim!.claim_location.longitude),
                         "status": currentState,
                         "approved_by": widget.uid,
                         "comment": comment
                       };
 
                       DatabaseService db = DatabaseService(uid: widget.uid);
-                      bool isSuccess = await db.updateClaimData(widget.claim!.claim_id, claim_data);
-                                    
+                      bool isSuccess = await db.updateClaimData(
+                          widget.claim!.claim_id, claim_data);
+
                       setState(() {
                         loading = false;
                       });
@@ -363,9 +404,7 @@ class _ClaimProfileState extends State<ClaimView> {
                       } else {
                         triggerErrorAlert();
                       }
-
-                  }
-                ),
+                    }),
               ],
             ),
           );

@@ -257,6 +257,67 @@ class DatabaseService {
         .map(_claimDataFromSnapshot);
   }
 
+  Future<List<Claim?>> similerClaimList(
+      String claim_id, double latitude, double longitude) async {
+    List<Claim?> claims = [];
+
+    // ~1 mile of lat and lon in degrees
+    double distance = 1.0;
+    double lat = 0.0144927536231884;
+    double lon = 0.0181818181818182;
+
+    double latitude_min = latitude - (lat * distance);
+    double longitude_min = longitude - (lon * distance);
+
+    double latitude_max = latitude + (lat * distance);
+    double longitude_max = longitude + (lon * distance);
+
+    print(latitude_min.toString() +
+        ":" +
+        longitude_min.toString() +
+        " - " +
+        latitude_max.toString() +
+        ":" +
+        longitude_max.toString());
+
+    await claim_collection
+        // .orderBy('timestamp', descending: true)
+        .where('claim_location',
+            isGreaterThan: GeoPoint(latitude_min, longitude_min))
+        .where('claim_location',
+            isLessThan: GeoPoint(latitude_max, longitude_max))
+        .get()
+        .then((QuerySnapshot querySnapshot) {
+      for (var doc in querySnapshot.docs) {
+        if (doc.reference.id != claim_id) {
+          claims.add(Claim(
+            claim_id: doc.reference.id,
+            uid: getString(doc, "uid"),
+            status: getString(doc, "status"),
+            timestamp: getInt(doc, "timestamp"),
+            claim_name: getString(doc, "claim_name"),
+            crop_type: getString(doc, "crop_type"),
+            reason: getString(doc, "reason"),
+            description: getString(doc, "description"),
+            agrarian_division: getString(doc, "agrarian_division"),
+            province: getString(doc, "province"),
+            damage_date: getString(doc, "damage_date"),
+            damage_area: getString(doc, "damage_area"),
+            estimate: getString(doc, "estimate"),
+            claim_image_urls: doc['claim_image_urls'] ?? [],
+            claim_video_url: getString(doc, "claim_video_url"),
+            claim_location: LatLng(doc['claim_location'].latitude,
+                doc['claim_location'].longitude),
+            comment: getString(doc, "comment"),
+            approved_by: getString(doc, "approved_by"),
+          ));
+        }
+      }
+    });
+
+    return claims;
+  }
+
   Stream<List<Officer?>> get officerList {
     return user_collection
         .where('type', isGreaterThanOrEqualTo: "officer")
